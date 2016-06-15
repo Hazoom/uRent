@@ -1,0 +1,832 @@
+package bl;
+
+import application.ApplicationConstants;
+import dao.CustomerDAO;
+import dao.RentDAO;
+import exportBeans.Abstract.RentDetailsSuperBean;
+import exportBeans.Abstract.RentListSuperBean;
+import exportBeans.FeedbackBuyerBean;
+import exportBeans.FeedbackSupplierBean;
+import exportBeans.RentListAndItemBean;
+import exportBeans.RentNotificationsCountBean;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * User: Ran
+ * Date: 26/10/14
+ * Time: 19:00
+ * This action is called from the login form.
+ * Deals with login and logout of customer.
+ */
+@Path("/RentService")
+@Stateless
+public class RentBL {
+
+    @EJB
+    RentDAO rentManager;
+
+    @EJB
+    CustomerDAO customerManager;
+
+    public RentBL() {
+    }
+
+    
+    /**
+     *
+     * @return
+     */
+    @Path("/Request")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String startRent(String JsonObject){
+        JSONObject json = null;
+
+        int response = ApplicationConstants.RequestRentStatus.InternalError.ordinal();
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int itemId = Integer.parseInt(json.get("ItemId").toString());
+            Date rentFrom = new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("RentFrom").toString());
+            Date rentTo = new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("RentTo").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+            	if (rentFrom.before(rentTo) || rentFrom.equals(rentTo)){
+            		// ApplicationConstants.RequestRentStatus.Success.ordinal()
+                    response = rentManager.startRent(customerId, itemId, rentFrom, rentTo);
+            	}
+                else{
+                	response = ApplicationConstants.RequestRentStatus.NonMatchingDates.ordinal();
+                }
+            }
+            else{
+            	response = ApplicationConstants.RequestRentStatus.CustomerFetchProblem.ordinal();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/Approve")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String approveRent(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.approve(customerId, rentId)){
+                response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/insertItemDescription")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String insertItemDescription(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+            String itemDescriptionPreRent = json.get("Description").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.insertItemDescpritionPreRent(customerId, rentId, itemDescriptionPreRent)){
+            	response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/Rent")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String inRent(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.inRent(customerId, rentId)){
+            	response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/End")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String endRent(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.end(customerId, rentId)){
+            	response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/Cancel")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String cancelRent(String JsonObject){
+        JSONObject json = null;
+
+        int ReturnedStatus = -1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+            String cancellationReason = json.get("Reason").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                ApplicationConstants.RentStatus status = rentManager.cancel(rentId, customerId, cancellationReason);
+
+                ReturnedStatus = (status != null ? status.ordinal() : -1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Status", ReturnedStatus);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/ChangeDates")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateRentDates(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+            Date newRentFrom = new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("RentFrom").toString());
+            Date newRentTo = new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("RentTo").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    (newRentFrom.before(newRentTo) || newRentFrom.equals(newRentTo)) &&
+                        rentManager.changeRentDates(rentId, customerId, newRentFrom, newRentTo)){
+            	response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/RateBuyer")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String rateBuyer(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+            int buyerRate = Integer.parseInt(json.get("BuyerRate").toString());
+            String feedback = json.get("BuyerFeedback").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.rateRentBuyer(rentId, buyerRate, feedback)){
+            	response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/RateSupplierAndItem")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String rateSupplierAndItem(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+            int supplierRate = Integer.parseInt(json.get("SupplierRate").toString());
+            String supplierFeedback = json.get("SupplierFeedback").toString();
+            int itemRate = Integer.parseInt(json.get("ItemRate").toString());
+            String itemFeedback = json.get("ItemFeedback").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    rentManager.rateRentSupplierAndItem(rentId, supplierRate, supplierFeedback, itemRate, itemFeedback)){
+                response = 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/AllBuyer")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Object> populateBuyerRents(String JsonObject){
+        JSONObject json = null;
+
+        List<Object> lstRents = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int pageNum = Integer.parseInt(json.get("PageNum").toString());
+            int resultsPerPage = Integer.parseInt(json.get("ResultsPerPage").toString());
+
+            int selectedStatus = -1;
+
+            try{
+                selectedStatus = ApplicationConstants.RentStatus.valueOf(
+                                                    json.get("SelectedStatus").toString()).ordinal();
+            } catch(Exception e){
+            }
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                lstRents = (selectedStatus == -1 ?
+                                    rentManager.getBuyerRents(customerId, pageNum, resultsPerPage) : 
+                                    rentManager.getBuyerRents(customerId, selectedStatus, pageNum, resultsPerPage));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstRents;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/AllSupplier")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Object> populateSupplierRents(String JsonObject){
+        JSONObject json = null;
+
+        List<Object> lstRents = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int pageNum = Integer.parseInt(json.get("PageNum").toString());
+            int resultsPerPage = Integer.parseInt(json.get("ResultsPerPage").toString());
+
+            int selectedStatus = -1;
+
+            try{
+                selectedStatus = ApplicationConstants.RentStatus.valueOf(
+                                        json.get("SelectedStatus").toString()).ordinal();
+            } catch(Exception e){
+            }
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                lstRents = (selectedStatus == -1 ?
+                                    rentManager.getSupplierRents(customerId, pageNum, resultsPerPage) :
+                                    rentManager.getSupplierRents(customerId, selectedStatus, pageNum, resultsPerPage));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstRents;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/AllItem")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Object> populateItemRents(String JsonObject){
+        JSONObject json = null;
+
+        List<Object> lstRents = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+
+            String loginDetails = json.get("CCC").toString();
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            int itemId = Integer.parseInt(json.get("ItemId").toString());
+            int pageNum = Integer.parseInt(json.get("PageNum").toString());
+            int resultsPerPage = Integer.parseInt(json.get("ResultsPerPage").toString());
+
+            int selectedStatus = -1;
+
+            Date startRange = null;
+            Date endRange = null;
+
+            try{
+                selectedStatus = ApplicationConstants.RentStatus.valueOf(
+                                    json.get("SelectedStatus").toString()).ordinal();
+            } catch(Exception e){
+                try{
+                    startRange =  new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("StartRange").toString());
+                    endRange =  new SimpleDateFormat("dd-MMMM-yyyy", Locale.US).parse(json.get("EndRange").toString());
+                }catch(Exception de){
+                    startRange = null;
+                }
+            }
+
+            if (selectedStatus == -1){
+                lstRents = (startRange == null ?
+                            rentManager.getItemRents(itemId, customerId, pageNum, resultsPerPage) :
+                            rentManager.getItemRents(itemId, customerId, startRange, endRange, pageNum, resultsPerPage));
+            } else{
+                lstRents = rentManager.getItemRents(itemId, customerId, selectedStatus, pageNum, resultsPerPage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstRents;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/BuyerRateNeed")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RentListSuperBean> populateNeededBuyerRateRents(String JsonObject){
+        JSONObject json = null;
+
+        List<RentListSuperBean> listOfRents = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                listOfRents = rentManager.getNeededBuyerRateRent(customerId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return listOfRents;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/SupplierAndItemRateNeed")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<RentListSuperBean> populateNeededSupplierAndItemRateRents(String JsonObject){
+        JSONObject json = null;
+
+        List<RentListSuperBean> listOfRents = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                listOfRents = rentManager.getNeededSupplierOrItemRateRent(customerId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return listOfRents;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/NewSumRentNotifications")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String countSumNewRentNotifications(String JsonObject){
+        JSONObject json = null;
+
+        long notificationsCount = 0;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                notificationsCount = rentManager.getCustomerSumRentNotificationsCount(customerId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Count", notificationsCount);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+//    /**
+//     *
+//     * @return
+//     */
+//    @Path("/NewDetailedRentNotifications")
+//    @POST
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public RentNotificationsCountBean countDetailedNewRentNotifications(String JsonObject){
+//        JSONObject json = null;
+//
+//        RentNotificationsCountBean notificationsCount = null;
+//
+//        try {
+//            json = (JSONObject) new JSONParser().parse(JsonObject);
+//            String loginDetails = json.get("CCC").toString();
+//
+//            int customerId = customerManager.validateLogin(loginDetails);
+//
+//            if (customerId != 0){
+//                Timestamp time = customerManager.getCustomerLastLogin(customerId);
+//                notificationsCount = rentManager.getCustomerDetailedRentNotificationsCount(customerId, time);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return notificationsCount;
+//    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/getRentDetails")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public RentDetailsSuperBean getFullRentDetails(String JsonObject){
+    	return this.getRentDetails(JsonObject); 
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/getRentStatus")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getRetnStatus(String JsonObject){
+        String jsonText = null;
+        
+    	RentDetailsSuperBean rent = this.getRentDetails(JsonObject); 
+    	
+    	if (rent != null){
+
+            JSONObject obj=new JSONObject();
+            obj.put("Status", rent.getStatusId());
+            StringWriter out = new StringWriter();
+            try {
+                obj.writeJSONString(out);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+            jsonText = out.toString();
+    	}
+    	
+    	return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/getAllBuyerFeedback")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<FeedbackBuyerBean> getAllBuyerFeedback(String JsonObject){
+        JSONObject json = null;
+
+        List<FeedbackBuyerBean> lstFeedback = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            
+            int customerId = customerManager.validateLogin(loginDetails);
+            
+            int wantedCustomerId = ApplicationConstants.DEFAULT_CUSTOMER_ID;
+
+            try{
+                wantedCustomerId = Integer.parseInt(json.get("WantedCustomerId").toString());
+                
+                lstFeedback = rentManager.getBuyerFeedback(wantedCustomerId);
+            } catch(Exception e){
+            }
+            
+            if (wantedCustomerId == ApplicationConstants.DEFAULT_CUSTOMER_ID){
+                lstFeedback = rentManager.getBuyerFeedback(customerId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstFeedback;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Path("/getAllSupplierFeedback")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<FeedbackSupplierBean> getAllSupplierFeedback(String JsonObject){
+        JSONObject json = null;
+
+        List<FeedbackSupplierBean> lstFeedback = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            
+            int customerId = customerManager.validateLogin(loginDetails);
+            
+            int wantedCustomerId = ApplicationConstants.DEFAULT_CUSTOMER_ID;
+
+            try{
+                wantedCustomerId = Integer.parseInt(json.get("WantedCustomerId").toString());
+                
+                lstFeedback = rentManager.getSupplierFeedback(wantedCustomerId);
+            } catch(Exception e){
+            }
+            
+            if (wantedCustomerId == ApplicationConstants.DEFAULT_CUSTOMER_ID){
+                lstFeedback = rentManager.getSupplierFeedback(customerId);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstFeedback;
+    }
+   
+    /**
+     * 
+     * @param JsonObject
+     * @return
+     */
+    private RentDetailsSuperBean getRentDetails(String JsonObject){
+        JSONObject json = null;
+
+        RentDetailsSuperBean rent = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int rentId = Integer.parseInt(json.get("RentId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0){
+                rent = rentManager.populateRentDetails(customerId, rentId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return rent;
+    }
+}

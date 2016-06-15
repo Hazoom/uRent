@@ -1,0 +1,47 @@
+<div class="col-md-9 column margintop20">
+    <div id="searchwell" class="well well-sm" scroll-glue-top="glued">
+        <div class="pull-right">
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <select class="form-control" ng-options="sort as sort.display for sort in sorts" ng-change="searchItems(selectedOrder)" ng-model="selectedOrder">
+                        <option value="">--- sort ---</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <strong>Items View</strong>
+        <div class="btn-group">
+            <a href ng-click="setCurrentView(1)" id="list" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"> </span> List</a>
+            <a href ng-click="setCurrentView(2)" id="grid" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> Grid</a>
+        </div>
+    </div>
+
+    <div ui-view>
+        <div ng-if="getCurrentView() == 1">
+            <itemlist-directive>
+            </itemlist-directive>
+        </div>
+        <div ng-if="getCurrentView() == 2">
+            <itemgrid-directive>
+            </itemgrid-directive>
+        </div>
+    </div>
+
+    <div class="col-md-12 column text-center">
+    	<pagination total-items="totalItemsSearch()" ng-model="$parent.currentPage" ng-change="pageChangedSearch()" max-size="maxSize"></pagination>
+    </div>
+    
+    <!--  
+    <div class="col-md-12 column text-center">
+        <ul class="pagination text-center">
+            <li id="leftArrow" ng-if="getCurrentPage() > 5"><a href ng-click="setCurrentPage(getCurrentPage() - 5); changePageClass(getCurrentPage()); searchItems(null)">&laquo;</a></li>
+            <li id="page{{getCurrentPage()}}" class="active"><a ng-click="changePageClass(getCurrentPage()); searchItems(null)">{{getCurrentPage()}}</a></li>
+            <li id="page{{getCurrentPage() + 1}}"><a href ng-click="changePageClass(getCurrentPage() + 1); searchItems(null)">{{getCurrentPage() + 1}}</a></li>
+            <li id="page{{getCurrentPage() + 2}}"><a href ng-click="changePageClass(getCurrentPage() + 2); searchItems(null)">{{getCurrentPage() + 2}}</a></li>
+            <li id="page{{getCurrentPage() + 3}}"><a href ng-click="changePageClass(getCurrentPage() + 3); searchItems(null)">{{getCurrentPage() + 3}}</a></li>
+            <li id="page{{getCurrentPage() + 4}}"><a  href ng-click="changePageClass(getCurrentPage() + 4); searchItems(null)">{{getCurrentPage() + 4}}</a></li>
+            <li id="rightArrow"><a href ng-click="setCurrentPage(getCurrentPage() + 5); changePageClass(getCurrentPage()); searchItems(null)">&raquo;</a></li>
+        </ul>
+    </div>
+    -->
+</div>

@@ -1,0 +1,16 @@
+<ul class="nav nav-pills nav-stacked">
+    <li class="active"><a href="#"><span class="glyphicon glyphicon-chevron-right"></span> Home</a></li>
+    <li ng-repeat="category in categoriesLst">
+        <a href="" id="category-{{category.id}}" ng-click="changeCategoryClass(category.id)" class="collapse" id="menu-group-{{category.name}}" data-toggle="collapse" data-target="#sub-menu-{{category.name}}"><span class="glyphicon glyphicon-chevron-right"></span> {{category.name}}</a>
+        <div class="collapse" data-parent="menu-group-{{category.name}}" id="sub-menu-{{category.name}}">
+            <ul class="nav nav-pills">
+                <li class="submenu" ng-repeat="sonCategory in category.subCategories">
+                    <a id="category-{{sonCategory.id}}" ng-click="changeCategoryClass(sonCategory.id)" href="#/categories/{{category.name}}/{{sonCategory.name}}?p=1"><span class="glyphicon glyphicon-plus"></span> {{sonCategory.name}}</a>
+                </li>
+                <li class="submenu">
+                    <a id="category-{{category.id}}-all" ng-click="changeCategoryClass(category.id)" href="#/categories/{{category.name}}?p=1"><span class="glyphicon glyphicon-plus"></span><b> All</b></a>
+                </li>
+            </ul>
+        </div>
+    </li>
+</ul>

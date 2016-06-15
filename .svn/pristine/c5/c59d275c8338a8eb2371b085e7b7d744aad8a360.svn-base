@@ -1,0 +1,25 @@
+<table class="table table-condensed table-hover">
+    <tbody>
+        <tr>
+            <td>Rents:</td>
+            <td>{{selectedItem.rentCount}}</td>
+        </tr>
+        <tr>
+            <td>Rate:</td>
+            <td>{{selectedItem.rate}}/5 from {{selectedItem.rateCount}} rents</td>
+        </tr>
+        <tr ng-show="!isOwner">
+            <td>Distance from your location:</td>
+            <td ng-show="selectedItem.ownerDistance == -1"><i>Login to see calculated distance</i></td>
+            <td ng-show="selectedItem.ownerDistance > -1">{{selectedItem.ownerDistance}} KM</td>
+        </tr>
+        <tr ng-show="!isOwner">
+            <td>Supplier:</td>
+            <td><a href="#/User/{{selectedItem.ownerId}}">{{selectedItem.ownerName}}</a></td>
+        </tr>
+        <tr ng-show="!isOwner">
+            <td>Supplier rate:</td>
+            <td>{{selectedItem.ownerRate}}/5 from {{selectedItem.ownerRateCount}} rents</td>
+        </tr>
+    </tbody>
+</table>

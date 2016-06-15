@@ -1,0 +1,12 @@
+<div class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-1 column">
+            <!-- <categories-directive>
+            </categories-directive> 
+            <bodyleftwells-directive>
+            </bodyleftwells-directive>-->
+        </div>
+        <showitem-directive>
+        </showitem-directive>
+    </div>
+</div>

@@ -1,0 +1,767 @@
+    app.directive("myrentsbodyDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "myRents-body.html"
+        };
+    });
+    
+    app.directive("myrentsbodyheaderDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "myRents-body-header.html"
+        };
+    });
+    
+    app.directive("myrentsbodybodyDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "myRents-body-body.html"
+        };
+    });
+
+    app.directive("showrentsDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "showRents.html"
+        };
+    });
+
+    app.directive("cancelrentDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "cancelRent.html"
+        };
+    });
+
+    app.directive("generalmessagesDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "general-messages.html"
+        };
+    });
+
+    app.directive("renttabsDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "rent-tabs.html"
+        };
+    });
+
+    app.directive("showrentDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "showRent.html"
+        };
+    });
+
+    app.directive("messagesDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "messages.html"
+        };
+    });
+
+    app.directive("showfeedbackDirective", function() {
+        return {
+            restrict: 'E',
+            templateUrl: "showAllFeedback.html"
+        };
+    });
+
+    app.controller('RentsController', function($scope, $http, $window, $filter, $stateParams, MainService, RentsService, MessagesService, CookiesService, LoginService) {
+        $scope.myRentsService = RentsService;
+
+        $scope.currentRentId = -1;
+        $scope.currentRentStatus = -1;
+
+    	$scope.glued = true;
+    	$scope.currentPage = 1;
+    	$scope.resultsPerPage = 7;
+    	$scope.maxSize = 5;
+
+    	$scope.isJustUnread = true;
+    	$scope.isIncludeCancelled = false;
+
+		$scope.detailsState = true;
+		$scope.messagesState = false;
+		$scope.cancelState = false;
+    	
+    	$scope.cancellationReason = "";
+
+    	$scope.buyerFeedback = "";
+    	$scope.buyerRate = 0;
+    	$scope.supplierFeedback = "";
+    	$scope.supplierRate = 0;
+    	$scope.itemFeedback = "";
+    	$scope.itemRate = 0;
+
+    	$scope.lstFeedback = {};
+
+        $scope.statusList = [
+            {display: "All", option:'All'},
+            {display: "Requested", option:'Requested'},
+            {display: "Approved", option:'Approved'},
+            {display: "In Rent", option:'InRent'},
+            {display: "Ended", option:'Ended'},
+            {display: "Closed", option:'Closed'},
+            {display: "Cancelled By Buyer", option:'CancelledByBuyer'},
+            {display: "Cancelled By Supplier", option:'CancelledBySupplier'}
+        ];
+        $scope.selectedStatus = $scope.statusList[0];
+        
+    	$scope.totalItemsRents = function() {
+    		return RentsService.totalItems;
+    	};
+    	
+    	$scope.pageChangedRents = function() {
+    		
+        	var pageOfCurrURL = $stateParams.p;
+        	
+        	RentsService.currentPage = $scope.currentPage;
+        	$window.location.href = $window.location.href.replace("p=" + pageOfCurrURL, "p=" + $scope.currentPage.toString());
+    	};
+    	
+        $scope.init = function(){
+            var ccc = CookiesService.getCookie("ccc");
+
+            $scope.currentRentId = -1;
+            $scope.currentRentStatus = -1;
+            
+            $scope.currentPage = $stateParams.p;
+            
+            $scope.filter = $stateParams.filter;
+            $scope.itemId = $stateParams.itemId
+        	
+            RentsService.inItemRents = -1;
+
+            LoginService.newRentsCount = 0;
+
+//            RentsService.getNotificationsCount(ccc, $scope);
+        }
+        	
+    	$scope.resultsPerPageChanged = function() {
+    		
+    		this.getRentsAccordingToTab();
+    	}
+    	
+    	$scope.getRentsAccordingToTab = function(){
+            $scope.currentRentId = -1;
+            $scope.currentRentStatus = -1;
+            
+    		MessagesService.conversation = [];
+    		
+        	$scope.validFilter = false;
+        	
+            RentsService.inBuyerRents = false;
+        	RentsService.inSupplierRents = false;
+    		
+            if (!MainService.isUndefinedOrNull($scope.currentPage)) {
+            	RentsService.currentPage = $scope.currentPage;
+            } else {
+            	RentsService.currentPage = $stateParams.p;
+            }
+            
+			if (!MainService.isUndefinedOrNull(!RentsService.currentPage)) {
+				RentsService.currentPage = 1;
+			}
+        	
+    		if (!angular.isUndefined($scope.filter) && 
+    				angular.isUndefined($scope.itemId)) {
+	            switch($scope.filter){
+		            case('by'):
+		                RentsService.inBuyerRents = true;
+		                RentsService.inSupplierRents = false;
+		                
+		                this.getRentsAsBuyer(RentsService.currentPage);
+		                break;
+		            case('from'):
+		                RentsService.inBuyerRents = false;
+		                RentsService.inSupplierRents = true;
+	                	
+		                this.getRentsAsSupplier(RentsService.currentPage);
+		                break;
+		            default:
+		                break;
+	            }
+	            
+            	$scope.validFilter = (RentsService.inSupplierRents || RentsService.inBuyerRents);
+    		}
+    		else if (!angular.isUndefined($scope.itemId) 
+    					&& angular.isUndefined($scope.filter) &&
+    						isFinite($scope.itemId)){  
+    				this.getRentsForItem($scope.itemId, null, null, RentsService.currentPage);
+    		}
+    	}
+        	
+    	$scope.includeCancelled = function() {
+    		if ($scope.isIncludeCancelled){
+    			$scope.rents = $filter('filter')($scope.rents, {statusId: '!5'} || {statusId: '!6'});
+    		}
+    	}
+        	
+    	$scope.justUnread = function() {
+    		
+    		alert($scope.isJustUnread);
+    	}
+        
+        $scope.getRent = function(rentId){            
+            var ccc = CookiesService.getCookie("ccc");
+            
+            for (var i = 0; i < RentsService.rents.length; i++){
+            	if (RentsService.rents[i].id == rentId){
+            		RentsService.rents[i].isNew = false;
+            		
+            		$scope.currentRentId = rentId;
+                    $scope.currentRentStatus = RentsService.rents[i].statusId;
+            	}
+            }
+            
+            if (!angular.isUndefined(rentId) && rentId != -1){
+                RentsService.getRentDetails(ccc, rentId, $scope);
+            }
+            else {
+                RentsService.getRentDetails(ccc, $stateParams.rentId, $scope);
+            }
+
+        }
+
+        $scope.approve = function(rentId){
+            var ccc = CookiesService.getCookie("ccc");
+    		
+    		MessagesService.allowChat = true;
+
+            RentsService.approve(ccc, rentId, $scope);
+        }
+
+        $scope.cancel = function(rentId){
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.cancel(ccc, rentId, $scope);
+        }
+        
+        $scope.submitItemDescriptionPreRent = function() {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.submitItemDescriptionPreRent(ccc, $stateParams.rentId, $scope);
+        }
+        
+        $scope.startRent = function() {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.startRent(ccc, $stateParams.rentId);
+        }
+        
+        $scope.endRent = function() {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.endRent(ccc, $stateParams.rentId);
+        }
+        
+        $scope.submitFeedback = function() {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.submitFeedback(ccc, $stateParams.rentId, $scope);
+        }
+
+        $scope.getRentsAsBuyer = function (pageNum) {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.getRentsAsBuyer(ccc, $scope, LoginService, pageNum);
+        };
+
+        $scope.getRentsAsSupplier = function (pageNum) {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.getRentsAsSupplier(ccc, $scope, LoginService, pageNum);
+        };
+
+        $scope.getRentsForItem = function (itemId, startDate, endDate, pageNum) {
+            var ccc = CookiesService.getCookie("ccc");
+
+            RentsService.getRentsForItem(ccc, itemId, $scope, startDate, endDate, pageNum);
+        };
+        
+        $scope.getAllBuyerFeedback = function () {
+            var ccc = CookiesService.getCookie("ccc");
+            
+            $scope.currentFeedbackPositionStr = "As Buyer";
+
+            RentsService.getAllBuyerFeedback($scope, ccc, $stateParams.customerId);
+        }
+        
+        $scope.getAllSupplierFeedback = function () {
+            var ccc = CookiesService.getCookie("ccc");
+            
+            $scope.currentFeedbackPositionStr = "As Supplier";
+
+            RentsService.getAllSupplierFeedback($scope, ccc, $stateParams.customerId);
+        }
+
+        $scope.getRentConversation = function(rentId, rentStatus) {
+            var ccc = CookiesService.getCookie("ccc");
+            
+            MessagesService.getRentConversation(ccc, $http, rentId, rentStatus);
+        }
+        
+        $scope.changeState = function(state) {
+            switch(state){
+            case('details'):
+        		$scope.detailsState = true;
+    			$scope.messagesState = false;
+	    		$scope.cancelState = false;
+    		
+                break;
+            case('messages'):
+        		$scope.detailsState = false;
+    			$scope.messagesState = true;
+	    		$scope.cancelState = false;
+	    		
+                break;
+            case('cancel'):
+        		$scope.detailsState = false;
+				$scope.messagesState = false;
+	    		$scope.cancelState = true;
+	    		
+                break;
+            default:
+                break;
+            }
+        }
+
+        $scope.getTab = function() {
+            return $scope.tab;
+        }
+
+        $scope.setTab = function(tab) {
+            $scope.tab = tab;
+        }
+    });
+
+    app.service('RentsService', function($http, $location, $anchorScroll, $filter, MainService, $window) {
+
+        var RentsService = {
+            isRequestedSuccessfully : false,
+            isReadyForRent : false,
+            isStarted : false,
+            failStatus : 0,
+            requestFailureReason : "",
+//            notificationsCount : {},
+            selectedRent : {},
+            rents : {},
+            rentFrom : "",
+            rentTo : "",
+            itemDescriptionOnScreen : "",
+            supplierFeedback : "",
+            itemFeedback : "",
+            buyerFeedback : "",
+            inBuyerRents : false,
+            inSupplierRents : false,
+            inItemRents : -1,
+            currentItemName : "",
+            totalItems : 0,
+            currentPage : 1,
+
+            initRentsCount : function(ccc, $http, LoginService) {
+                var data = { "CCC" : ccc};
+                return $http.post('urent/RentService/NewSumRentNotifications', data).then(function(result) {
+
+                    var count = result.data.Count;
+                    if (count > -1) {
+
+                        count = "" + count;
+                        if (count.length > 4){
+                            count = ">9999";
+                        }
+
+                        LoginService.newRentsCount = count;
+                    }
+                });
+            },
+            
+            getRentStatus : function(rentId){
+            	var data = {"RentId" : rentId};
+                return $http.post('urent/RentService/getRentStatus', data).then(function(result) {
+                	return result.data.Status;
+                });
+            },
+            
+            getRentDetails : function(ccc, rentId, $scope){
+                var data = { "CCC" : ccc, "RentId" : rentId};
+                return $http.post('urent/RentService/getRentDetails', data).then(function(result) {
+                	
+                	RentsService.selectedRent = result.data;
+                });
+            },
+
+            request : function(ccc, $scope, itemId, RentFrom, RentTo, $modalInstance){
+                var data = { "CCC" : ccc, "ItemId" : itemId, 
+                		"RentFrom" : $filter('date')(RentFrom, 'dd-MMMM-yyyy'), 
+                		"RentTo" : $filter('date')(RentTo, 'dd-MMMM-yyyy')};
+                return $http.post('urent/RentService/Request', data).then(function(result) {
+                	if (result.data.Response == 0){
+                		$scope.isRequestedSuccessfully = true;
+                        $modalInstance.close();
+                	}
+                	else{
+                		var errorResponse = result.data.Response;
+                		
+                		switch(errorResponse){
+	            			case (1):
+	                    		RentsService.requestFailureReason = "Couldn't identify customer";
+	            				break;
+	            			case (2):
+	                    		RentsService.requestFailureReason = "Wrong input dates";
+	            				break;
+	            			case (3):
+	                    		RentsService.requestFailureReason = "Item already rented in this period";
+            					break;
+	            			case (4):
+	                    		RentsService.requestFailureReason = "Can't rent from yourself";
+            					break;
+        					default:
+	                    		RentsService.requestFailureReason = "Unknown internal error. Request failed.";
+        						break;
+                		}
+                		
+                		RentsService.failStatus = errorResponse;
+                	}
+                });
+            },
+
+            approve : function(ccc, rentId, $scope){
+                var data = { "CCC" : ccc, "RentId" : rentId};
+                return $http.post('urent/RentService/Approve', data).then(function(result) {
+                    for(var i = 0; i < RentsService.rents.length; i++) {
+                        if (RentsService.rents[i].id == rentId) {
+                            $scope.currentRentStatus = 1;
+                        	RentsService.rents[i].statusId = 1;
+                        	RentsService.rents[i].statusDescription = "Approved"
+                            break;
+                        }
+                    }
+                });
+            },
+
+            cancel : function(ccc, rentId, $scope){
+                var data = { "CCC" : ccc, "RentId" : rentId, "Reason": $scope.cancellationReason};
+                return $http.post('urent/RentService/Cancel', data).then(function(result) {
+                    for(var i = 0; i < RentsService.rents.length; i++) {
+                        if (RentsService.rents[i].id == rentId) {
+                        	$scope.currentRentStatus = result.data.Status;
+                        	RentsService.rents[i].statusId = result.data.Status;
+                        	
+                            if (RentsService.rents[i].statusId == 5){
+                            	RentsService.rents[i].statusDescription = "Cancelled By Buyer"
+                            }
+                            else{
+                            	RentsService.rents[i].statusDescription = "Cancelled By Supplier"
+                            }
+                            break;
+                        }
+                    }
+                });
+            },
+            
+            submitItemDescriptionPreRent : function(ccc, rentId){
+            	
+            	var id = rentId;
+            	if (angular.isUndefined(id)) {
+            		id = RentsService.selectedRent.id;
+            	}
+                var data = { "CCC" : ccc, "RentId" : id, "Description" : RentsService.itemDescriptionOnScreen};
+                return $http.post('urent/RentService/insertItemDescription', data).then(function(result) {
+                	if (result.data.Response == 0){ 
+                		RentsService.selectedRent.itemDescriptionPreRent = RentsService.itemDescriptionOnScreen;
+                	}
+              });
+            },
+            
+            startRent : function(ccc, rentId){
+            	var id = rentId;
+            	if (angular.isUndefined(id)) {
+            		id = RentsService.selectedRent.id;
+            	}
+                var data = { "CCC" : ccc, "RentId" : id};
+                return $http.post('urent/RentService/Rent', data).then(function(result) {
+                	if (result.data.Response == 0){ 
+	                	RentsService.selectedRent.statusId = 2;
+	                	RentsService.selectedRent.statusDescription = "In Rent";
+                	}
+              });
+            },
+            
+            endRent : function(ccc, rentId){
+            	var id = rentId;
+            	if (angular.isUndefined(id)) {
+            		id = RentsService.selectedRent.id;
+            	}
+                var data = { "CCC" : ccc, "RentId" : id};
+                return $http.post('urent/RentService/End', data).then(function(result) {
+                	if (result.data.Response == 0){ 
+	                	RentsService.selectedRent.statusId = 3;
+	                	RentsService.selectedRent.statusDescription = "Ended";
+                	}
+              });
+            },
+            
+            submitFeedback : function(ccc, rentId, $scope){
+            	if (RentsService.selectedRent.isBuyer){
+                	var id = rentId;
+                	if (angular.isUndefined(id)) {
+                		id = RentsService.selectedRent.id;
+                	}
+                    var data = { "CCC" : ccc, "RentId" : id, 
+                    		"SupplierRate" : RentsService.selectedRent.supplierRate, "SupplierFeedback" : RentsService.supplierFeedback, 
+                    			"ItemRate" : RentsService.selectedRent.itemRate, "ItemFeedback" : RentsService.itemFeedback};
+                    return $http.post('urent/RentService/RateSupplierAndItem', data).then(function(result) {
+                    	if (result.data.Response == 0){ 
+                    		RentsService.selectedRent.supplierFeedback = RentsService.supplierFeedback;
+                    		RentsService.selectedRent.itemFeedback = RentsService.itemFeedback;
+                    		
+                    		if (RentsService.selectedRent.buyerFeedback.length > 0){
+        	                	RentsService.selectedRent.statusId = 4;
+        	                	RentsService.selectedRent.statusDescription = "Closed";
+                    		}
+                    	}
+                    });
+            	}
+            	else {
+                    var data = { "CCC" : ccc, "RentId" : rentId, "BuyerRate" : RentsService.selectedRent.buyerRate, 
+                												 "BuyerFeedback" : RentsService.buyerFeedback};
+                    return $http.post('urent/RentService/RateBuyer', data).then(function(result) {
+                    	if (result.data.Response == 0){ 
+                    		RentsService.selectedRent.buyerFeedback = RentsService.buyerFeedback;
+                    		
+                    		if (RentsService.selectedRent.supplierFeedback.length > 0){
+        	                	RentsService.selectedRent.statusId = 4;
+        	                	RentsService.selectedRent.statusDescription = "Closed";
+                    		}
+                    	}
+                    });
+            	}
+            },
+
+            changeRentDates : function(ccc, rentId, RentFrom, RentTo, $modalInstance){
+            	RentsService.rentFrom = RentFrom;
+            	RentsService.rentTo = RentTo;
+            	
+            	var id = rentId;
+            	if (angular.isUndefined(id)) {
+            		id = RentsService.selectedRent.id;
+            	}
+                var data = { "CCC" : ccc, "RentId" : id, 
+                		"RentFrom" : $filter('date')(RentsService.rentFrom, 'dd-MMMM-yyyy'), 
+                		"RentTo" : $filter('date')(RentsService.rentTo, 'dd-MMMM-yyyy')};
+                return $http.post('urent/RentService/ChangeDates', data).then(function(result) {
+                	if (result.data.Response == 0){
+                    	RentsService.selectedRent.startRent = RentsService.rentFrom;
+                    	RentsService.selectedRent.endRent = RentsService.rentTo;
+                    	
+                        $modalInstance.close();
+                	}
+                	else{
+                		var errorResponse = result.data.Response;
+                		
+                		switch(errorResponse){
+	            			case (1):
+	                    		RentsService.requestFailureReason = "Couldn't identify customer";
+	            				break;
+	            			case (2):
+	                    		RentsService.requestFailureReason = "Wrong input dates";
+	            				break;
+	            			case (3):
+	                    		RentsService.requestFailureReason = "Item already rented in this period";
+            					break;
+	            			case (4):
+	                    		RentsService.requestFailureReason = "Can't rent from yourself";
+            					break;
+        					default:
+	                    		RentsService.requestFailureReason = "Unknown internal error. Request failed.";
+        						break;
+                		}
+                		
+                		RentsService.failStatus = errorResponse;
+                	}
+                });
+            },
+            
+           getValueOfParameter : function (query) {
+        	   var query_string = {};
+        	   var vars = query.split("&");
+        	   for (var i=0;i<vars.length;i++) {
+        		   var pair = vars[i].split("=");
+        		   // If first entry with this name
+        		   if (typeof query_string[pair[0]] === "undefined") {
+        			   query_string[pair[0]] = pair[1];
+        			   // If second entry with this name
+        			   } else if (typeof query_string[pair[0]] === "string") {
+        				   var arr = [ query_string[pair[0]], pair[1] ];
+        				   query_string[pair[0]] = arr;
+        				   // If third or later entry with this name
+    				   } else {
+    					   query_string[pair[0]].push(pair[1]);
+					   }
+        		   } 
+        	   return query_string;
+        	},
+
+//            getNotificationsCount : function(ccc, $scope) {
+//                var data = { "CCC" : ccc};
+//                return $http.post('urent/RentService/NewDetailedRentNotifications', data).then(function(result) {
+////                    $("#newRentsCount").text(0);
+//                    
+////                    var count = result.data;
+////                    count.buyerCount = 0;
+//                    RentsService.notificationsCount = result.data;
+//                });
+//            },
+
+            getRentsAsBuyer : function(ccc, $scope, LoginService, pageNum) {
+            	
+                var data = {};
+                if (MainService.isUndefinedOrNull($scope.selectedStatus) || $scope.selectedStatus.option == "All") {
+                    data = { "CCC" : ccc, "PageNum" : pageNum, "ResultsPerPage" : $scope.resultsPerPage };
+                }
+                else {
+                    data = { "CCC" : ccc, "SelectedStatus" : $scope.selectedStatus.option, "PageNum" : $scope.currentPage, "ResultsPerPage" : $scope.resultsPerPage};
+                }
+
+
+                return $http.post('urent/RentService/AllBuyer', data).then(function(result) {
+//                    	RentsService.notificationsCount.buyerCount = 0;
+                	
+//                    	for (var i = 0; i < result.data.length; i++){
+//                    		for (var j = 0; j < RentsService.rents.length; j++){
+//                    			if (result.data[i].id == RentsService.rents[i].id){
+//                    				result.data.isNew = true;
+//                    			}
+//                    		}
+//                    	}
+                	
+                	RentsService.totalItems = result.data[0];
+                    RentsService.rents = result.data[1];
+                });
+            },
+
+            getRentsAsSupplier : function(ccc, $scope, LoginService, pageNum) {
+            		
+                var data = {};
+                if (MainService.isUndefinedOrNull($scope.selectedStatus) || $scope.selectedStatus.option == "All") {
+                    data = { "CCC" : ccc, "PageNum" : pageNum, "ResultsPerPage" : $scope.resultsPerPage };
+                }
+                else {
+                    data = { "CCC" : ccc, "SelectedStatus" : $scope.selectedStatus.option, "PageNum" : $scope.currentPage, "ResultsPerPage" : $scope.resultsPerPage};
+                }
+
+                return $http.post('urent/RentService/AllSupplier', data).then(function(result) {
+//        			$rootScope.$apply(function(){
+//                	RentsService.notificationsCount.supplierCount = 0;
+                	
+                	RentsService.totalItems = result.data[0];
+                    RentsService.rents = result.data[1];
+//        			});
+                });
+            },
+
+            getRentsForItem : function(ccc, itemId, $scope, startDate, endDate, pageNum) {
+                var data = {};
+                if (MainService.isUndefinedOrNull($scope.selectedStatus) || $scope.selectedStatus.option == "All") {
+                	if (MainService.isUndefinedOrNull(startDate)){
+                        data = { "CCC" : ccc, "ItemId" : itemId, "PageNum" : $scope.currentPage, "ResultsPerPage" : $scope.resultsPerPage };
+                	}
+                	else {
+                        data = { "CCC" : ccc, "ItemId" : itemId, "StartRange" : startDate, "EndRange" : endDate, 
+                        		"PageNum" : pageNum, "ResultsPerPage" : $scope.resultsPerPage };
+                	}
+                }
+                else {
+                    data = { "CCC" : ccc, "ItemId" : itemId, "SelectedStatus" : $scope.selectedStatus.option, 
+                    		"PageNum" : pageNum, "ResultsPerPage" : $scope.resultsPerPage};
+                }
+
+                return $http.post('urent/RentService/AllItem', data).then(function(result) {  
+                    
+                    if (result.data.length > 0) {   
+                    	RentsService.totalItems = result.data[0];
+                    	
+                    	var item = result.data[1];
+                    	RentsService.inItemRents = item.itemId;
+                    	RentsService.currentItemName = item.itemName;
+                    	
+                        RentsService.rents = result.data[2];
+                    }
+                    else {
+                    	RentsService.inItemRents = -1;              	
+                        RentsService.rents = [];
+                    }
+                });
+            },
+            
+            getAllBuyerFeedback : function($scope, ccc, wantedCustomerId){
+                var dataText = "{";
+                
+                if (!MainService.isUndefinedOrNull(ccc)) {
+                	dataText = dataText + "\"CCC\" : \"" + ccc + "\"";
+                }
+                
+                if (!MainService.isUndefinedOrNull(wantedCustomerId)) {
+                	if (dataText.length > 1){
+                		dataText = dataText + ', ';
+                	}
+                	
+                	dataText = dataText + "\"WantedCustomerId\" : \"" + wantedCustomerId + "\"";
+                }
+                
+                dataText = dataText + "}";
+
+                if (dataText.length > 2) {
+
+//                    data = { "CCC" : ccc, "WantedCustomerId" : wantedCustomerId};
+	                return $http.post('urent/RentService/getAllBuyerFeedback', angular.fromJson(dataText)).then(function(result) {
+	                    $scope.lstFeedback = result.data;
+	                });
+                }
+            	else {
+            		return null;
+            	}
+            },
+            
+            getAllSupplierFeedback : function($scope, ccc, wantedCustomerId){
+                var dataText = "{";
+                
+                if (!MainService.isUndefinedOrNull(ccc)) {
+                	dataText = dataText + "\"CCC\" : \"" + ccc + "\"";
+                }
+                
+                if (!MainService.isUndefinedOrNull(wantedCustomerId)) {
+                	if (dataText.length > 1){
+                		dataText = dataText + ', ';
+                	}
+                	
+                	dataText = dataText + "\"WantedCustomerId\" : \"" + wantedCustomerId + "\"";
+                }
+                
+                dataText = dataText + "}";
+
+                if (dataText.length > 2) {
+	                return $http.post('urent/RentService/getAllSupplierFeedback', angular.fromJson(dataText)).then(function(result) {
+	                    $scope.lstFeedback = result.data;
+	                });
+                }
+            	else {
+            		return null;
+            	}
+            },
+            
+            putNewRentsOnTop : function(){
+            	for (var i = RentsService.rents.length; i >= 0; i--){
+            		if (RentsService.rents[i].isNew){
+            			RentsService.unshift(RentsService.rents[i]);
+            			RentsService.splice(i + 1, 1);
+            		}
+            	}
+            }
+        }
+
+        return RentsService;
+    });

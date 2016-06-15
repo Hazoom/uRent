@@ -1,0 +1,69 @@
+.menu li{
+    float:left;
+}
+.menu li a{
+    background:#ffffff ;
+    color:#c3c3c3;
+    display:block;
+    line-height:35px;
+    padding:0px 3px;
+    text-align:center;
+    text-decoration:none;
+}
+.menu li a:hover, .menu ul li:hover a{
+    background: #ffffff;
+    color: #c3c3c3;
+    text-decoration:none;
+}
+/* define the sub-menu container */
+.menu li ul{
+    background:#ffffff;
+    display:none;
+    height:auto;
+    padding:0px;
+    margin:0px;
+    border:0px;
+    position:absolute;
+    width:30%;
+    z-index:200;
+    /*top:1em;
+    /*left:0;*/
+}
+.menu li:hover ul{
+    display:block;
+}
+/* divide the sub-menus to 2 columns by width property */
+.menu li li {
+    display:block;
+    float:left;
+    width:33%;
+}
+.menu li ul a{
+    display:block;
+    height:auto;
+    font-size:12px;
+    font-style:normal;
+    margin:0px;
+    padding:0px 5px;
+    text-align:left;
+}
+/* when hovering on sub-menus */
+.menu li ul a:hover, .menu li ul li:hover a{
+    background: #ffffff /*url('../images/hover_sub.gif') center left no-repeat*/;
+    border:0px;
+    color: #4ca7bf;
+    font-style: italic;
+    text-decoration:none;
+}
+
+.c123{
+    background:#ffffff ;
+    color:#c3c3c3;
+    display:block;
+    line-height:35px;
+    padding:0px 3px;
+    text-align:center;
+    text-decoration:none;
+    float: left;
+    width: 10%;
+}

@@ -1,0 +1,96 @@
+/* ------------------------------------------
+PURE CSS SPEECH BUBBLES
+by Nicolas Gallagher
+- http://nicolasgallagher.com/pure-css-speech-bubbles/
+
+http://nicolasgallagher.com
+http://twitter.com/necolas
+
+Created: 02 March 2010
+Version: 1.2 (03 March 2011)
+
+Dual licensed under MIT and GNU GPLv2 Nicolas Gallagher
+------------------------------------------ */
+
+/* NOTE: Some declarations use longhand notation so that it can be clearly
+explained what specific properties or values do and what their relationship
+is to other properties or values in creating the effect */
+
+/* ============================================================================================================================
+== BUBBLE WITH A RIGHT-ANGLED TRIANGLE
+** ============================================================================================================================ */
+
+/* THE SPEECH BUBBLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+.triangle-right {
+  position:relative;
+  padding:15px;
+  margin:1em 0 3em;
+  color:#000000;
+  font-size:0.75em;
+  background:#E9EBEB; /* default background for browsers without gradient support */
+  /* css3 */
+  background:-webkit-gradient(linear, 0 0, 0 100%, from(#2e88c4), to(#E9EBEB));
+  background:-moz-linear-gradient(#2e88c4, #E9EBEB);
+  background:-o-linear-gradient(#2e88c4, #E9EBEB);
+  background:linear-gradient(#2e88c4, #E9EBEB);
+  -webkit-border-radius:10px;
+  -moz-border-radius:10px;
+  border-radius:10px;
+}
+
+/* Variant : for left positioned triangle
+------------------------------------------ */
+
+.triangle-right.left {
+  margin-left:40px;
+  background:#E9EBEB;
+}
+
+/* Variant : for right positioned triangle
+------------------------------------------ */
+
+.triangle-right.right {
+  margin-right:40px;
+  background:#E9EBEB;
+}
+
+/* THE TRIANGLE
+------------------------------------------------------------------------------------------------------------------------------- */
+
+.triangle-right:after {
+  content:"";
+  position:absolute;
+  bottom:-20px; /* value = - border-top-width - border-bottom-width */
+  left:50px; /* controls horizontal position */
+  border-width:20px 0 0 20px; /* vary these values to change the angle of the vertex */
+  border-style:solid;
+  border-color:#E9EBEB transparent;
+  /* reduce the damage in FF3.0 */
+  display:block;
+  width:0;
+}
+
+/* Variant : left
+------------------------------------------ */
+
+.triangle-right.left:after {
+  top:16px;
+  left:-40px; /* value = - border-left-width - border-right-width */
+  bottom:auto;
+  border-width:15px 40px 0 0; /* vary these values to change the angle of the vertex */
+  border-color:transparent #E9EBEB;
+}
+
+/* Variant : right
+------------------------------------------ */
+
+.triangle-right.right:after {
+  top:16px;
+  right:-40px; /* value = - border-left-width - border-right-width */
+  bottom:auto;
+  left:auto;
+  border-width:15px 0 0 40px; /* vary these values to change the angle of the vertex */
+  border-color:transparent #E9EBEB ;
+}}

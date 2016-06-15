@@ -1,0 +1,180 @@
+<div ng-controller="ShowItemController" class="" style="text-align: left;">
+    <div class="col-md-12 column">
+        <ol class="breadcrumb round">
+            <li><a href="#"><i class="fa fa-home"></i></a></li>
+            <li ng-if="!selectedItem.parentCategoryName"><a href="#/categories/{{selectedItem.categoryName}}?p=1">{{selectedItem.categoryName}}</a></li>
+            <li ng-if="selectedItem.parentCategoryName"><a href="#/categories/{{selectedItem.parentCategoryName}}?p=1">{{selectedItem.parentCategoryName}}</a></li>
+            <li ng-if="selectedItem.parentCategoryName"><a href="#/categories/{{selectedItem.parentCategoryName}}/{{selectedItem.categoryName}}?p=1">{{selectedItem.categoryName}}</a></li>
+            <li><a href="#/ItemDetails/{{selectedItem.id}}">{{selectedItem.name}}</a></li>
+        </ol>
+        <div class="col-md-12 column productboxmain">
+            <div class="row clearfix">
+                <div class="col-md-8 column">
+                	<div id="blueimp-gallery" class="blueimp-gallery" data-use-bootstrap-modal="false">
+					    <!-- The container for the modal slides -->
+					    <div class="slides"></div>
+					    <!-- Controls for the borderless lightbox -->
+					    <h3 class="title"></h3>
+					    <a class="prev">&lsaquo;</a>
+					    <a class="next">&rsaquo;</a>
+					    <a class="close">&times;</a>
+					    <a class="play-pause"></a>
+					    <ol class="indicator"></ol>
+					    <!-- The modal dialog, which will be used to wrap the lightbox content 
+					    <div class="modal fade">
+					        <div class="modal-dialog">
+					            <div class="modal-content">
+					                <div class="modal-header">
+					                    <button type="button" class="close" aria-hidden="true">&times;</button>
+					                    <h4 class="modal-title"></h4>
+					                </div>
+					                <div class="modal-body next"></div>
+					                <div class="modal-footer">
+					                    <button type="button" class="btn btn-default pull-left prev">
+					                        <i class="glyphicon glyphicon-chevron-left"></i>
+					                        Previous
+					                    </button>
+					                    <button type="button" class="btn btn-primary next">
+					                        Next
+					                        <i class="glyphicon glyphicon-chevron-right"></i>
+					                    </button>
+					                </div>
+					            </div>
+					        </div>
+					    </div>-->
+					</div>
+
+                    <a ng-if="selectedItem.lstPhotos.length > 0" href="data:image/jpeg;base64,{{selectedItem.lstPhotos[0].photo}}" data-gallery title="{{selectedItem.name}} image 1"><img ng-src="data:image/jpeg;base64,{{selectedItem.lstPhotos[0].photo}}" class="img-responsive" alt="{{selectedItem.name}} image 1"></a>
+                    <a ng-if="selectedItem.lstPhotos.length == 0" href="img/no_image_available.jpg" data-gallery title="{{selectedItem.name}} image 1"><img src="img/no_image_available.jpg" class="img-responsive" alt="No Image Available"></a>
+                    <div ng-if="$index > 0" class="col-md-2 column productboxthumb" ng-repeat="photo in selectedItem.lstPhotos track by $index">
+                        <a href="data:image/jpeg;base64,{{photo.photo}}" data-gallery title="{{selectedItem.name}} image {{$index + 1}}">
+                            <img ng-src="data:image/jpeg;base64,{{photo.photo}}" class="img-responsive" alt="{{selectedItem.name}} image {{$index + 1}}">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 column">
+                    <h1>{{selectedItem.name}}</h1>
+                    <!-- {{selectedItem.description}} <br> -->
+                    <div ng-if="selectedItem.rate == 0">
+                        <b>Rating:</b> <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 0 && selectedItem.rate <= 0.5">
+                        <b>Rating:</b> <i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 0.5 && selectedItem.rate <= 1">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 1 && selectedItem.rate <= 1.5">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 1.5 && selectedItem.rate <= 2">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 2 && selectedItem.rate <= 2.5">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 2.5 && selectedItem.rate <= 3">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 3 && selectedItem.rate <= 3.5">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 3.5 && selectedItem.rate <= 4">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 4 && selectedItem.rate <- 4.5">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i>
+                    </div>
+                    <div ng-if="selectedItem.rate > 4.5">
+                        <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i>
+                    </div>
+                    <div>
+                    	<b>Category: </b><a href="#/categories/{{selectedItem.parentCategoryName}}/{{selectedItem.categoryName}}?p=1">{{selectedItem.categoryName}}</a>
+                    </div>
+                    <div id="fbLike">
+                    	<div class="fb-like" data-href="https://app-urent.rhcloud.com/#/ItemDetails/{{selectedItem.id}}" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
+                    </div>
+                    <div class="productprice">
+                        <div class="pricetext" ng-if="!selectedItem.dailyPrice">Daily: N/A</div>
+                        <div class="pricetext" ng-if="selectedItem.dailyPrice">Daily: ${{selectedItem.dailyPrice}}</div>
+                        <div class="pricetext" ng-if="!selectedItem.weeklyPrice">Weekly: N/A</div>
+                        <div class="pricetext" ng-if="selectedItem.weeklyPrice">Weekly: ${{selectedItem.weeklyPrice}}</div>
+                        <div class="pricetext" ng-if="!selectedItem.monthlyPrice">Monthly: N/A</div>
+                        <div class="pricetext" ng-if="selectedItem.monthlyPrice">Monthly: ${{selectedItem.monthlyPrice}}</div>
+                        <div class="pricetext" ng-if="!selectedItem.value">Value: N/A</div>
+                        <div class="pricetext" ng-if="selectedItem.value">Value: ${{selectedItem.value}}</div>
+                    </div>
+                   	<span ng-show="!isOwner">
+	                    <button ng-controller="DatePickerController as datePickerCtrl" ng-click="pick()" type="button" class="btn-primary btn-sm"><span class="glyphicon glyphicon-shopping-cart"></span> I WANT THIS</button>
+	                    <ul class="fa-ul margintop10">
+	                        <li><i class="fa-li fa fa-user"></i><b><a href="#/User/{{selectedItem.ownerId}}">{{selectedItem.ownerName}}</a></b></li>
+	                    </ul>
+	                	<div ng-show="isRequestedSuccessfully" class="alert alert-success">Request sent successfully!</div>
+                	</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 column productbox">
+            <div class="row clearfix">
+                <div class="col-md-12 column">
+                    <itemtabs-directive></itemtabs-directive>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-controller="DatePickerController">
+    <script type="text/ng-template" id="DatesForRent.html">
+        <div ng-show="loggedIn" ng-init="init()">
+            <div class="modal-header">
+                <h3 class="modal-title">Choose Rent Dates</h3>
+            </div>
+            <div class="modal-body">
+                <form name="rentDatesForm" id="rentDatesForm" novalidate role="form">
+                    <h4>Rent From</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="startRentDT" ng-change="startRentChanged(); calcDaysAndPrice()" is-open="startRentOpened" min-date="minDate" datepicker-options="dateOptions" ng-required="true" show-button-bar=false />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="startRentOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <h4>To</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="endRentDT" ng-change="calcDaysAndPrice()" is-open="endRentOpened" min-date="startRentDT" datepicker-options="dateOptions" ng-required="true" show-button-bar=false />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="endRentOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <pre>Rent for {{totalDays}} days. Total {{totalPayment}}$</pre>
+                </form>
+            </div>
+            <div class="modal-footer">
+				<div ng-show="myRentsService.failStatus > 0" class="pull-left">
+               		<div class="alert alert-danger">{{myRentsService.requestFailureReason}}</div>
+				</div>
+                <button class="btn-success btn-sm" ng-click="ok(); rentDatesForm.$submitted = true;">OK</button>
+                <button class="btn-danger btn-sm" ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+
+        <div ng-show="!loggedIn">
+            <div class="modal-body">
+                <div class="alert alert-danger">Need to login in order to rent!</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-danger btn-sm" ng-click="cancel()">Return</button>
+            </div>
+        </div>
+    </script>
+</div>

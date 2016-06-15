@@ -1,0 +1,55 @@
+<div class="container col-md-12 column pull-left no-padding" ng-controller="MessagesController">
+        <div class="chat-window up-5-padding" scroll-glue-bottom=true>
+	        <div class="panel panel-default">
+	            <div class="top-bar">
+	           		<h3 class="panel-title"><span class="glyphicon glyphicon-comment"></span> Chat - Discuss About This Rent</h3>
+	            </div>
+	            <div class="panel-body msg_container_base" ng-repeat="message in myMessagesService.conversation track by message.id">
+	                <div ng-if="message.ownerId == message.senderId" class="row msg_container base_sent">
+	                    <div class="col-md-11 col-xs-11">
+	                        <div class="messages msg_sent">
+	                            <p>{{message.content}}</p>
+	                            <time datetime="2009-11-13T20:00">{{message.timeAgo}}</time>
+	                        </div>
+	                    </div>
+	                    <!-- <div class="col-md-1 col-xs-1 avatar">
+	                        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class="msg_img img-responsive ">
+	                    </div> -->
+	                </div>
+	                <div ng-if="message.ownerId == message.receiverId" class="row msg_container base_receive">
+	                    <!-- <div class="col-md-1 col-xs-1 avatar">
+	                        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg" class="msg_img img-responsive ">
+	                    </div> -->
+	                    <div class="col-md-11 col-xs-11">
+	                        <div class="messages msg_receive">
+	                            <p>{{message.content}}</p>
+	                            <time datetime="2009-11-13T20:00">{{message.timeAgo}}</time>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="panel-footer" ng-show="myMessagesService.allowChat">
+	                <div class="input-group">
+	                    <textarea id="btn-input" ng-model="messageBody" rows="2" class="form-control input-sm chat_input non-resizable" placeholder="Write your message here..."></textarea>
+	                    <span class="input-group-btn">
+	                    <button ng-click="replyMessage()" class="btn btn-primary btn-sm" id="btn-chat">Send</button>
+	                    </span>
+	                </div>
+	            </div>
+	        </div>
+		</div>
+
+    <!--<div class="btn-group dropup">-->
+        <!--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">-->
+            <!--<span class="glyphicon glyphicon-cog"></span>-->
+            <!--<span class="sr-only">Toggle Dropdown</span>-->
+        <!--</button>-->
+        <!--<ul class="dropdown-menu" role="menu">-->
+            <!--<li><a href="#" id="new_chat"><span class="glyphicon glyphicon-plus"></span> Novo</a></li>-->
+            <!--<li><a href="#"><span class="glyphicon glyphicon-list"></span> Ver outras</a></li>-->
+            <!--<li><a href="#"><span class="glyphicon glyphicon-remove"></span> Fechar Tudo</a></li>-->
+            <!--<li class="divider"></li>-->
+            <!--<li><a href="#"><span class="glyphicon glyphicon-eye-close"></span> Invisivel</a></li>-->
+        <!--</ul>-->
+    <!--</div>-->
+</div>

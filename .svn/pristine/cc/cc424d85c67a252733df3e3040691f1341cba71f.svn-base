@@ -1,0 +1,13 @@
+<div class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-3 column">
+            <categories-directive>
+            </categories-directive>
+            <!--<bodyleftwells-directive>
+            </bodyleftwells-directive> -->
+        </div>
+        <div ng-controller="SearchController" ng-init="init(); searchItems()" class="container" style="text-align: left;">
+            <div ng-include src="'searchresults.html'"></div>
+        </div>
+    </div>
+</div>

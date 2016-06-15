@@ -1,0 +1,30 @@
+<div class="container margintop20" ng-controller="UserController">
+    <div class="row">
+        <div ng-if="!forgotPassword.sentMail && forgotPassword.afterSubmit" style="text-align: center;">
+            <div class="row">
+                <label><b>Critical Error occurred. Please try again</b></label>
+            </div>
+        </div>
+        <div ng-if="forgotPassword.sentMail && forgotPassword.afterSubmit" style="text-align: center;">
+            <div class="row">
+                <label><b>Authentication message send to your email</b></label>
+            </div>
+        </div>
+        <form ng-if="!forgotPassword.afterSubmit" name="forgotPasswordForm" id="forgotPasswordForm" novalidate valid-submit="sendForgotPasswordForm()" role="form">
+            <div class="form-group clearfix" ng-class="{
+                        'has-error': forgotPasswordForm.$submitted && forgotPasswordForm.Email.$invalid,
+                        'has-success': forgotPasswordForm.$submitted && forgotPasswordForm.Email.$valid}">
+                <label class="col-lg-2 control-label" for="NewPassword">Enter your Email:</label>
+                <div class="col-lg-5">
+                    <input id="Email" name="Email" type="email" class="form-control" ng-model="forgotPassword.Email" required autofocus/>
+                    <div class="alert alert-danger" ng-show="forgotPasswordForm.$submitted && forgotPasswordForm.Email.$error.required">Invalid Email</div>
+                </div>
+            </div>
+            <div class="form-group margintop10">
+                <div class="col-lg-10 col-lg-offset-2 text-center">
+                    <button type="submit" class="btn-primary btn-sm" ng-disabled="forgotPasswordForm.$invalid">Authenticate</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

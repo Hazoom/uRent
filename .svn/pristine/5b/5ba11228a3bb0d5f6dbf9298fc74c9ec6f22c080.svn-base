@@ -1,0 +1,26 @@
+<ol id="breadcrumb" class="breadcrumb">
+    <li><a>Customer #{{user.id}}</a></li>
+</ol>
+
+<div class="col-md-12 column productboxmain">
+	<table class="table table-condensed table-hover">
+	    <tbody>
+	    <tr>
+	        <td>Customer Name:</td>
+	        <td>{{user.firstName}} {{user.lastName}}</td>
+	    </tr>
+	    <tr>
+	        <td>Joined Date:</td>
+	        <td>{{user.dateJoined | date:'MM/dd/yyyy'}}</td>
+	    </tr>
+	    <tr>
+	        <td>Rate as Buyer:</td>
+	        <td>{{user.rateAsBuyer}}/5 from {{user.rateAsBuyerCount}} rates</td>
+	    </tr>
+	    <tr>
+	        <td>Rate as Supplier:</td>
+	        <td>{{user.rateAsSupplier}}/5 from {{user.rateAsSupplierCount}} rates</td>
+	    </tr>
+	    </tbody>
+	</table>
+</div>

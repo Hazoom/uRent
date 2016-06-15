@@ -1,0 +1,16 @@
+<div class="up-5-padding">
+	<div ng-if="messagesState">
+		<div ng-show="currentRentStatus == 0">
+			<img ng-src="img/chat_available_only_after_approval.jpg" class="img-responsive"/>
+		</div>
+		<div ng-show="currentRentStatus > 0">
+			<messages-directive></messages-directive>
+		</div>
+	</div>
+	<div ng-if="detailsState">
+		<showrent-directive></showrent-directive>
+	</div>
+	<div ng-if="cancelState">
+		<cancelrent-directive></cancelrent-directive>
+	</div>
+</div>

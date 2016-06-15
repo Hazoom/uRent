@@ -1,0 +1,3 @@
+<div class="tabcontent">
+    {{selectedItem.description}}
+</div>

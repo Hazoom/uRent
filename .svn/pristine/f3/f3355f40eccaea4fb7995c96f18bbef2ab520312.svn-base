@@ -1,0 +1,15 @@
+<a ng-show="currentRentStatus > -1 && (messagesState || cancelState)" href ng-click="getRent(currentRentId); changeState('details')" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<span class="glyphicon glyphicon-book"></span> 
+	Details mode
+</a>
+
+<a ng-show="currentRentStatus > -1 && (detailsState || cancelState)" href ng-click="getRentConversation(currentRentId, currentRentStatus); changeState('messages')" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<span class="glyphicon glyphicon-book"></span> 
+	Messages mode
+</a>
+
+<a ng-show="currentRentStatus > -1" href="#/Rent/{{currentRentId}}" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<i class="fa fa-external-link"></i> 
+	Refer to
+</a>
+   	

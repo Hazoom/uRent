@@ -1,0 +1,11 @@
+<ol id="breadcrumb" class="breadcrumb">
+    <li><a href="#"><i class="glyphicon glyphicon-home"></i></a></li>
+    <li><a>Advanced Search</a></li>
+    <li><a>By Member</a></li>
+</ol>
+
+<div class="well well-sm">
+    <div class="row">
+    	<label><b>Items by Member</b></label>
+    </div>
+</div>

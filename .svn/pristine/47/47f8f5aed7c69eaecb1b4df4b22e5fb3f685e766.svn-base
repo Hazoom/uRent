@@ -1,0 +1,26 @@
+<div ng-controller="MyAreaController" ng-init="init()" class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-3 column">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">My Area</h3>
+                </div>
+                <ul class="fa-ul margintop10">
+                    <li ng-class="{ active2 : getTab() == 1 }" class="active"><i class="fa-li fa fa-user"></i><b><a ng-href="#/MyArea?tab=1">My Account</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 2 }"><i class="fa-li fa fa-pencil"></i><b><a ng-href="#/MyArea?tab=2">Edit Account</a></b></li>
+					<li ng-class="{ active2 : getTab() == 3 }"><i class="fa-li fa fa-lock"></i><b><a ng-href="#/MyArea?tab=3">Change Password</a></b></li>
+					<li ng-class="{ active2 : getTab() == 4 }"><i class="fa-li fa fa-comments"></i><b><a ng-href="#/MyArea?tab=4">Buyer Feedback</a></b></li>
+					<li ng-class="{ active2 : getTab() == 5 }"><i class="fa-li fa fa-comments"></i><b><a ng-href="#/MyArea?tab=5">Supplier Feedback</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 6 }"><i class="fa-li fa fa-shopping-cart"></i><b><a ng-href="#/MyArea?p=1&tab=6">My Items</a></b></li>
+        			<hr/>
+                    <li ng-class="{ active2 : isTabUndefined() && addItem }"><i class="fa-li fa fa-plus"></i><b><a ng-href="#/MyArea?action=add">Add New Item</a></b></li>
+               	 	<hr/>
+                	<li><a ng-controller="LoginController as loginCtrl" href ng-click="logOut()"><i class="fa-li fa fa-sign-out"></i><b>Logout</b></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 column">
+            <myareabody-directive></myareabody-directive>
+        </div>
+    </div>
+</div>

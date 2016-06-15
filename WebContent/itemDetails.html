@@ -1,0 +1,123 @@
+<div ng-controller="ShowItemController" ng-init="getItem()" class="container" style="text-align: left;"
+     xmlns="http://www.w3.org/1999/html">
+
+    <div class="PostContent">
+        <p>
+            <h3>{{myShowItemsService.selectedItem.name}}</h3>
+            <span><i>since {{myShowItemsService.selectedItem.datePublished}}</i></span>
+            <br/>
+            <span>{{myShowItemsService.selectedItem.description}}</span>
+        </p>
+        <hr class="line">
+
+        <table width="100%" border="0">
+            <tr>
+                <td valign="top" width="40%">
+                    <table>
+                        <tr>
+                            <td><span class="itemDescBlack">Availability for now: </span></td>
+                            <td><span class="itemDescBlue"><b>{{myShowItemsService.selectedItem.availability}}</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Category: </span></td>
+                            <td><span class="itemDescBlue"><b><a href="#/categories/{{myShowItemsService.selectedItem.categoryName}}">{{myShowItemsService.selectedItem.categoryName}}</a></b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Distance from your location: </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.ownerDistance}} KM</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Number of rents: </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.rentCount}}</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Got rate of </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.rate}} </b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">from </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.rateCount}} rents</b></span></td>
+                        </tr>
+
+                        <tr><td colspan="10"><span class="itemHeader"><b><i>Supplier details</i></b></span></td></tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Name: </span></td>
+                            <td><span class="itemDescBlue"><b><a href="#/User/{{myShowItemsService.selectedItem.ownerId}}">{{myShowItemsService.selectedItem.ownerName}}</a></b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Got Supplier rate of </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.ownerRate}} </b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">from </span></td>
+                            <td><span class="itemDescBlack"><b>{{myShowItemsService.selectedItem.ownerRateCount}} rents</b></span></td>
+                        </tr>
+
+                    </table>
+
+                </td>
+                <td valign="top"  width="20%">
+                    <table>
+                        <tr><td colspan="2"><span class="itemHeader">Pricing</span></td></tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Day:</span></td>
+                            <td><span class="itemDescBlue"><b>{{myShowItemsService.selectedItem.dailyPrice}} $</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Week:</span></td>
+                            <td><span class="itemDescBlue"><b>{{myShowItemsService.selectedItem.weeklyPrice}} $</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Month:</span></td>
+                            <td><span class="itemDescBlue"><b>{{myShowItemsService.selectedItem.monthlyPrice}} $</b></span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="itemDescBlack">Value:</span></td>
+                            <td><span class="itemDescBlue"><b>{{myShowItemsService.selectedItem.value}} $</b></span></td>
+                        </tr>
+                    </table>
+
+                </td>
+
+                <td valign="top"  width="40%">
+                    <table width="100%">
+                        <tr><td><span class="itemHeader">Share this</span></td></tr>
+                        <tr>
+                            <td>
+                                <div class="addthis_toolbox">
+                                    <div class="custom_images">
+                                        <a class="addthis_button_twitter"><img src="images/twitter_logo_small.png" width="64" height="64" alt="Twitter" /></a>
+                                        <a class="addthis_button_facebook"><img src="images/facebook-logo-small.jpg" width="64" height="64" alt="Facebook" /></a>
+                                    </div>
+                                </div>
+                                <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#username=xa-4baa067e6bbb2376"></script>
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td>
+                                <iframe src="http://www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.rentoid.com%2Fitem%2FWomenssnowboardcompletewithbindingsandboots-Heidelberg-9820&amp;layout=standard&amp;show_faces=true&amp;width=450&amp;action=like&amp;colorscheme=light&amp;height=80" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:250px; height:80px;" allowTransparency="true"></iframe>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div class="row">
+            <div class="col-sm-6">
+                <div id="myCarousel" class="carousel slide" style="width: 400px; margin: 0 auto">
+                    <div class="carousel-inner">
+                        <div class ="item" ng-class="{active:!$index}" ng-repeat="photo in myShowItemsService.selectedItem.lstPhotos">
+                            <img  ng-src="data:image/jpeg;base64,{{photo.photo}}" alt="">
+                        </div>
+                    </div>
+                    <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="cleared"></div>
+</div>

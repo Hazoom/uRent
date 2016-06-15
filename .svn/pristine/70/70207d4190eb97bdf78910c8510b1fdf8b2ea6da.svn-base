@@ -1,0 +1,13 @@
+<div>
+	<h2><i>Cancel Rent</i></h2>
+	<h4><a href="#/ItemDetails/{{myRentsService.selectedRent.itemId}}"> {{myRentsService.selectedRent.itemName}}</a></h4>
+	<form>
+  		<div class="form-group">
+    		<textarea ng-model="cancellationReason" class="form-control non-resizable" rows="3" placeholder="Enter cancellation reason.."></textarea>
+  		</div>
+     	<button class="btn-danger btn-sm" ng-disabled="cancellationReason.length == 0" ng-click="cancel(currentRentId)">
+     		<span class="glyphicon glyphicon-remove"></span>
+			Cancel
+		</button>
+	</form>
+</div>

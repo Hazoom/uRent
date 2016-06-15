@@ -1,0 +1,723 @@
+package daoBeans;
+
+import application.ApplicationConstants;
+import dao.CustomerDAO;
+import entities.CustomerEntity;
+import exportBeans.Abstract.CustomerProfileSuperBean;
+import exportBeans.Public.CustomerProfilePublicBean;
+import exportBeans.Self.CustomerProfileSelfBean;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.jboss.resteasy.util.Base64;
+import org.json.simple.JSONObject;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 30/11/14
+ * Time: 13:24
+ * To change this template use File | Settings | File Templates.
+ */
+@Stateless
+public class CustomerDAOBean implements CustomerDAO {
+
+    @PersistenceContext(unitName="WhyBuyPersistenceUnit")
+    private EntityManager manager;
+
+
+    private final int LOGIN_HASHED_PASSWORD_LENGTH = 32;
+
+    private final int AES_KEY_LENGTH_BITS = 128;
+    private final int AES_KEY_LENGTH_BYTES = AES_KEY_LENGTH_BITS / 8;
+    private final int AES_RANDOM_GENERATED_KEY_LENGTH = 24;
+
+    private final byte[] AESKey = {
+            0x74, 0x68, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79
+    };
+
+    public CustomerDAOBean() {}
+
+    /**
+     * Check if customer with the given details exist and password is valid.
+     * @param Email The email address.
+     * @param Password The password after md5 encryption.
+     * @return If user exist and the password is as given.
+     */
+    @SuppressWarnings("unchecked")
+	public String validateLogin(String Email, String Password){
+        int loginStatus = ApplicationConstants.LOGIN_FAILED;
+        CustomerEntity customer = null;
+
+        if ((customer = this.getCustomerByEmail(Email)) != null ) {
+
+            if (this.isSuspended(customer)) {
+                loginStatus = ApplicationConstants.USER_SUSPENDED;
+            }
+            else {
+                if (customer.getHashedpassword().equals(this.getMD5Encrypt(Password + customer.getSalt()))) {
+                    if (customer.getLoginattempts() > 0){
+                        customer.setLoginattempts(0);
+                    }
+
+			        customer.setLastLogin(new Timestamp(new Date().getTime()));
+                    manager.merge(customer);
+
+                    if (customer.isInitpassword()) {
+                        loginStatus = ApplicationConstants.CHANGE_PASSWORD;
+                    }
+                    else {
+                        loginStatus = ApplicationConstants.LOGIN_SUCCESSFUL;
+                    }
+                }
+                else {
+                    this.incrementLoginAttempts(customer);
+                }
+            }
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response", loginStatus);
+        if (loginStatus != ApplicationConstants.LOGIN_FAILED) {
+            obj.put("FirstName", customer.getFirstname());
+            obj.put("LastName",customer.getLastname());
+            obj.put("UserID", customer.getId());
+            obj.put("Lat",customer.getPoslatitude());
+            obj.put("Lon", customer.getPoslongitude());
+            obj.put("ccc", this.getAESEncrypt(customer.getId() + customer.getHashedpassword()));
+
+        }
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean validateLogin(int CustomerId, String HashedPassword){
+        CustomerEntity currCustomer;
+
+        boolean isUserValid = false;
+
+        if ((currCustomer = this.getCustomerById(CustomerId)) != null ) {
+            isUserValid = (currCustomer.getHashedpassword().equals(HashedPassword));
+        }
+
+        return isUserValid;
+    }
+
+    private CustomerEntity validateLoginCustomer(int CustomerId, String HashedPassword){
+        CustomerEntity currCustomer;
+
+        boolean isUserValid = false;
+
+        if ((currCustomer = this.getCustomerById(CustomerId)) != null ) {
+            isUserValid = (currCustomer.getHashedpassword().equals(HashedPassword));
+        }
+
+        if (isUserValid) {
+            return currCustomer;
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param LoginString
+     * @return
+     */
+    public int validateLogin(String LoginString){
+        String DecryptedLoginString;
+        int returnedId = 0;
+
+        if (LoginString.length() > LOGIN_HASHED_PASSWORD_LENGTH &&
+                !(DecryptedLoginString = this.getAESDecrypt(LoginString)).isEmpty()){
+
+            int customerId = Integer.parseInt(DecryptedLoginString.substring(
+                                    0, DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH));
+            String password = DecryptedLoginString.substring(
+                                    DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH);
+
+            if (this.validateLogin(customerId, password)){
+                returnedId = customerId;
+            }
+        }
+
+        return returnedId;
+    }
+
+    @SuppressWarnings("unchecked")
+	public String validateLoginWithDetails(String LoginString){
+        String DecryptedLoginString;
+
+        JSONObject obj=new JSONObject();
+
+        if (LoginString.length() > LOGIN_HASHED_PASSWORD_LENGTH &&
+               !(DecryptedLoginString = this.getAESDecrypt(LoginString)).isEmpty()){
+
+            int customerId = Integer.parseInt(DecryptedLoginString.substring(
+                    0, DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH));
+            String password = DecryptedLoginString.substring(
+                    DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH);
+
+            CustomerEntity currCustomer;
+
+            if ((currCustomer = this.validateLoginCustomer(customerId, password)) != null){
+
+            	// TODO: only if it's remember me check
+            	if (false){
+	            	currCustomer.setLastLogin(new Timestamp(new Date().getTime()));
+	                manager.merge(currCustomer);
+            	}
+
+                obj.put("Response",0);
+                obj.put("FirstName",currCustomer.getFirstname());
+                obj.put("LastName",currCustomer.getLastname());
+                obj.put("Email",currCustomer.getEmail());
+                obj.put("UserID",currCustomer.getId());
+                obj.put("Lat",currCustomer.getPoslatitude());
+                obj.put("Lon",currCustomer.getPoslongitude());
+                obj.put("ccc", this.getAESEncrypt(currCustomer.getId() + currCustomer.getHashedpassword()));
+            } else {
+                obj.put("Response",1);
+            }
+        }
+
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+
+    }
+
+    @SuppressWarnings("unchecked")
+	public String getUserDetails(String LoginString){
+        String DecryptedLoginString;
+
+        JSONObject obj=new JSONObject();
+
+        if (LoginString.length() > LOGIN_HASHED_PASSWORD_LENGTH &&
+                !(DecryptedLoginString = this.getAESDecrypt(LoginString)).isEmpty()){
+
+            int customerId = Integer.parseInt(DecryptedLoginString.substring(
+                    0, DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH));
+            String password = DecryptedLoginString.substring(
+                    DecryptedLoginString.length() - LOGIN_HASHED_PASSWORD_LENGTH);
+
+            CustomerEntity currCustomer;
+
+            if ((currCustomer = this.validateLoginCustomer(customerId, password)) != null){
+
+                obj.put("Response",0);
+                obj.put("FirstName",currCustomer.getFirstname());
+                obj.put("LastName",currCustomer.getLastname());
+                obj.put("Email",currCustomer.getEmail());
+                obj.put("ID",currCustomer.getId());
+                obj.put("Lat",currCustomer.getPoslatitude());
+                obj.put("Lon",currCustomer.getPoslongitude());
+                obj.put("RateSupplier", currCustomer.getRateassupplier());
+                obj.put("RateSupplierCount", currCustomer.getRateassuppliercount());
+                obj.put("RateBuyer", currCustomer.getRateasbuyer());
+                obj.put("RateBuyerCount", currCustomer.getRateasbuyercount());
+                obj.put("DateJoined", currCustomer.getDateJoined().getTime());
+                obj.put("LastLogin", currCustomer.getLastLogin().getTime());
+            } else {
+                obj.put("Response",1);
+            }
+        }
+
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+
+    }
+
+    /**
+     *
+     * @param CustomerId
+     * @return
+     */
+    @Override
+    public Timestamp getCustomerLastLogin(int CustomerId) {
+        Timestamp time = null;
+
+        CustomerEntity customer = null;
+
+        if ((customer = this.getCustomerById(CustomerId)) != null){
+            time = customer.getLastLogin();
+        }
+
+        return time;
+    }
+
+    /**
+     * Adds a customer to the database.
+     * @param Email
+     * @param FirstName
+     * @param LastName
+     * @param Password
+     * @return If the action succeeded.
+     */
+    public int addCustomer(String Email, String FirstName, String LastName,
+                           double Latitude, double Longitude,
+                           String Password){
+        CustomerEntity currCustomer = this.getCustomerByEmail(Email);
+        int addResult = ApplicationConstants.ADD_CUSTOMER_FAILED;
+
+        if (currCustomer == null) {
+            try {
+
+                final Random r = new SecureRandom();
+                byte[] Salt = new byte[32];
+                r.nextBytes(Salt);
+
+                String SaltWord = Salt.toString();
+
+                currCustomer = new CustomerEntity(Email, FirstName, LastName, Latitude, Longitude,
+                                                this.getMD5Encrypt(Password + SaltWord), SaltWord);
+
+                manager.persist(currCustomer);
+
+                addResult = ApplicationConstants.ADD_CUSTOMER_SUCCEEDED;
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            addResult = ApplicationConstants.USER_EXIST;
+        }
+
+        return addResult;
+    }
+
+    /**
+     *
+     * @param FirstName
+     * @param LastName
+     * @return
+     */
+    public boolean updateCustomer(int CustomerId, String Email, String FirstName, String LastName, double Lat, double Lon){
+        CustomerEntity currCustomer = this.getCustomerById(CustomerId);
+        boolean isCustomerUpdated = false;
+
+        if (currCustomer != null) {
+
+            try {
+
+//                if (!(Email).isEmpty()) {
+//                    currCustomer.setEmail(Email);
+//                }
+                if (!(FirstName).isEmpty()) {
+                    currCustomer.setFirstname(FirstName);
+                }
+                if (!(LastName).isEmpty()) {
+                    currCustomer.setLastname(LastName);
+                }
+                currCustomer.setPoslongitude(Lon);
+                currCustomer.setPoslatitude(Lat);
+
+                manager.merge(currCustomer);
+
+                isCustomerUpdated = true;
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isCustomerUpdated;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean deleteCustomer(int CustomerId) {
+        CustomerEntity currCustomer = this.getCustomerById(CustomerId);
+        boolean isCustomerDeleted = false;
+
+        if (currCustomer != null) {
+
+            try {
+                manager.remove(currCustomer);
+
+                isCustomerDeleted = true;
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isCustomerDeleted;
+    }
+    
+     /**
+     * @param Password
+     * @return
+     */
+    public String changePassword(int CustomerId, String Password) {
+        CustomerEntity currCustomer = this.getCustomerById(CustomerId);
+        String newCCC = null;
+
+        if (currCustomer != null) {
+
+            try {
+
+                final Random r = new SecureRandom();
+                byte[] Salt = new byte[32];
+                r.nextBytes(Salt);
+
+                String HashedNewPassword = getMD5Encrypt(Password + Salt);
+
+                currCustomer.setHashedpassword(HashedNewPassword);
+                currCustomer.setSalt(Salt.toString());
+//                currCustomer.setInitpassword(isInitPassword);
+//                currCustomer.setSuspended(false);
+//                currCustomer.setLoginattempts(0);
+
+                manager.merge(currCustomer);
+
+                newCCC = this.getAESEncrypt(CustomerId + HashedNewPassword);
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return newCCC;
+    }
+
+	 /**
+	 * @param Password
+	 * @return
+	 */
+    public String changePassword(String Email, String Password) {
+        CustomerEntity currCustomer = this.getCustomerByEmail(Email);
+        String newCCC = null;
+
+        if (currCustomer != null) {
+
+            try {
+
+                final Random r = new SecureRandom();
+                byte[] Salt = new byte[32];
+                r.nextBytes(Salt);
+
+                String HashedNewPassword = getMD5Encrypt(Password + Salt);
+
+                currCustomer.setHashedpassword(HashedNewPassword);
+                currCustomer.setSalt(Salt.toString());
+//                currCustomer.setInitpassword(isInitPassword);
+//                currCustomer.setSuspended(false);
+//                currCustomer.setLoginattempts(0);
+
+                manager.merge(currCustomer);
+
+                newCCC = this.getAESEncrypt(currCustomer.getId() + HashedNewPassword);
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return newCCC;
+    }
+
+	 /**
+	 * @param Password
+	 * @return
+	 */
+   public String createInitPasswordString(String Email) {
+      String initString = null;
+      try {
+   	   CustomerEntity customer = this.getCustomerByEmail(Email);
+   	   
+   	   if (customer != null){
+	           initString = this.getAESEncrypt(Email + "=" + customer.getSalt() + new Date().getTime());
+   	   }
+      } catch (HibernateException e) {
+          e.printStackTrace();
+      }
+
+      return initString;
+  }
+
+	 /**
+	 * @param Password
+	 * @return
+	 */
+   public String verifyInitPasswordString(String passwordStr) {
+     String email = null;
+     try {
+    	 String decryptedInit = this.getAESDecrypt(passwordStr);
+    	 
+    	 int emailEndLocation = decryptedInit.indexOf("=");
+    	 
+   		CustomerEntity customer = this.getCustomerByEmail(decryptedInit.substring(0, emailEndLocation));
+  	   
+  	   if (customer != null){
+  		   int saltEndLocation = emailEndLocation + customer.getSalt().length() + 1;
+  		   
+  		   // 900000 miliseconds is 15 minutes.
+  		   if (decryptedInit.substring(emailEndLocation + 1, saltEndLocation).equals(customer.getSalt()) &&
+  				   new Date().getTime() - Long.parseLong(decryptedInit.substring(saltEndLocation)) <= 900000){
+  			   email = customer.getEmail();
+  		   }
+  	   }
+     } catch (Exception e) {
+         e.printStackTrace();
+     }
+
+     return email;
+  	}
+    
+    /**
+     * 
+     */
+    @Override
+    public CustomerProfileSuperBean populateCustomerDetails(int WantedCustomerId, int CustomerId){
+    	CustomerProfileSuperBean wantedCustomer = null;
+    	
+    	try{
+        	CustomerEntity wantedEntity = manager.find(CustomerEntity.class, WantedCustomerId);
+        	
+        	if (wantedEntity != null){
+        		wantedCustomer = this.convertEntity(wantedEntity, CustomerId);
+        	}
+    	} catch(Exception e){
+    		e.printStackTrace();
+    	}
+    	
+    	return wantedCustomer;
+    }
+
+    /**
+     *
+     * @param CustomerId
+     * @return
+     */
+    public CustomerEntity getCustomerById(int CustomerId) {
+        CustomerEntity customer = null;
+
+        try{
+            customer = manager.find(CustomerEntity.class, CustomerId);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return customer;
+    }
+
+    /**
+     *
+     * @param Email
+     * @return
+     */
+    public CustomerEntity getCustomerByEmail(String Email) {
+        CustomerEntity customer = null;
+
+        try{
+            manager.unwrap(Session.class).enableFilter("email").setParameter("eMail", Email);
+
+            List<CustomerEntity> customerLst = manager
+                    .createNamedQuery("Customer.ID", CustomerEntity.class).getResultList();
+            if (customerLst != null && customerLst.size() > 0) {
+                customer = customerLst.get(0);
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return customer;
+    }
+
+    /**
+     *
+     * @param strToEncrypt
+     * @return
+     */
+    private String getAESEncrypt(String strToEncrypt){
+        try
+        {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec secretKey;
+            String encryptedString;
+
+            byte[] generatedKey = new byte[AES_KEY_LENGTH_BYTES];
+//            byte[] encryptedGeneratedKey = new byte[AES_KEY_LENGTH_BYTES];
+
+            do{
+                new SecureRandom().nextBytes(generatedKey);
+//                System.arraycopy(generatedKey, 0, encryptedGeneratedKey, 0, AES_KEY_LENGTH_BYTES);
+//
+//                for(int i = 0; i < AES_KEY_LENGTH_BYTES; i++){
+//                    encryptedGeneratedKey[i] ^= AESKey[i];
+//                }
+//
+//                secretKey = new SecretKeySpec(generatedKey, "AES");
+                secretKey = new SecretKeySpec(AESKey, "AES");
+                cipher.init(Cipher.ENCRYPT_MODE, secretKey, new IvParameterSpec(generatedKey));
+                encryptedString = Base64.encodeBytes(cipher.doFinal(strToEncrypt.getBytes()))
+//                        .concat(Base64.encodeBytes(encryptedGeneratedKey));
+                        .concat(Base64.encodeBytes(generatedKey));
+            } while (Base64.encodeBytes(generatedKey).contains("/") ||
+                    Base64.encodeBytes(cipher.doFinal(strToEncrypt.getBytes())).contains("/"));
+
+            return encryptedString;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    private String getAESDecrypt(String strToDecrypt){
+        try
+        {
+            byte[] generatedKey = Base64.decode(strToDecrypt.substring(
+                                        strToDecrypt.length() - AES_RANDOM_GENERATED_KEY_LENGTH));
+
+//            for(int i = 0; i < AES_KEY_LENGTH_BYTES; i++){
+//                generatedKey[i] ^= AESKey[i];
+//            }
+
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            SecretKeySpec secretKey = new SecretKeySpec(AESKey, "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(generatedKey));
+            String decryptedString = new String(cipher.doFinal(Base64.decode(
+                    strToDecrypt.substring(0, strToDecrypt.length() - AES_RANDOM_GENERATED_KEY_LENGTH))));
+            return decryptedString;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param Password
+     * @return
+     */
+    private String getMD5Encrypt(String Password) {
+        // Password encryption.
+        java.security.MessageDigest messageDigest = null;
+        try {
+            messageDigest = java.security.MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        byte[] array = messageDigest.digest(Password.getBytes());
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < array.length; ++i) {
+            stringBuffer.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+        }
+
+        return stringBuffer.toString();
+    }
+
+    /**
+     *
+     * @param Customer
+     */
+    private void incrementLoginAttempts(CustomerEntity Customer) {
+
+        if (Customer != null) {
+            try {
+                int customerLoginAttempts = Customer.getLoginattempts();
+
+                if (customerLoginAttempts == ApplicationConstants.MAX_LOGIN_ATTEMPTS) {
+                    Customer.setSuspended(true);
+                    Customer.setLoginattempts(0);
+                }
+                else {
+                    Customer.setLoginattempts(++customerLoginAttempts);
+                }
+
+                manager.persist(Customer);
+
+            } catch (HibernateException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     *
+     * @param Customer
+     * @return
+     */
+    private boolean isSuspended(CustomerEntity Customer) {
+
+        boolean isUserSuspended = false;
+
+        if (Customer != null){
+            isUserSuspended = Customer.isSuspended();
+        }
+
+        return isUserSuspended;
+    }
+    
+    /**
+     * 
+     * @param WantedCustomer
+     * @param CustomerId
+     * @return
+     */
+    private CustomerProfileSuperBean convertEntity(CustomerEntity WantedCustomer, int CustomerId){
+    	CustomerProfileSuperBean wantedCustomer = null;
+    	
+    	try{
+    		if (WantedCustomer.getId() == CustomerId){
+    			wantedCustomer = new CustomerProfileSelfBean(WantedCustomer);
+    		}
+    		else{
+    			wantedCustomer = new CustomerProfilePublicBean(WantedCustomer);
+    		}
+    	} catch(Exception e){
+    		e.printStackTrace();
+    	}
+    			
+		return wantedCustomer;
+    }
+}

@@ -1,0 +1,414 @@
+package bl;
+
+import dao.CategoryDAO;
+import dao.CustomerDAO;
+import dao.ItemDAO;
+import dao.RentDAO;
+import application.ApplicationConstants;
+import exportBeans.CategoryBean;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 05/12/14
+ * Time: 11:38
+ * To change this template use File | Settings | File Templates.
+ */
+@Path("/SearchService")
+@Stateless
+public class SearchBL {
+
+    @EJB
+    private ItemDAO itemManager;
+
+    @EJB
+    private CustomerDAO customerManager;
+
+    @EJB
+    private CategoryDAO categoryManager;
+
+    @EJB
+    private RentDAO rentManager;
+
+    public SearchBL(){
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/search")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Object> search(String JsonObject){
+
+        JSONObject json = null;
+        List<Object> lstResults = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            
+            int customerId = ApplicationConstants.DEFAULT_CUSTOMER_ID;
+            try {
+                String loginDetails = json.get("CCC").toString();
+                customerId = customerManager.validateLogin(loginDetails);
+            } catch (Exception e){}
+
+            int pageNum = ApplicationConstants.DEFAULT_PAGE_NUM;
+            try {
+                pageNum = Integer.parseInt(json.get("PageNum").toString());
+            } catch (Exception e){}
+
+            int resultsPerPage = ApplicationConstants.DEFAULT_RESULT_PER_PAGE;
+            try {
+                resultsPerPage = Integer.parseInt(json.get("ResultsPerPage").toString());
+            } catch (Exception e){}
+
+            String orderOption = ApplicationConstants.DEFAULT_ORDER_OPTION;
+            try {
+                orderOption = json.get("OrderOption").toString();
+            } catch (Exception e){}
+
+            ApplicationConstants.OrderByOrder orderOrder = ApplicationConstants.DEFAULT_ORDER_BY_ORDER;
+            try {
+                orderOrder = ApplicationConstants.OrderByOrder.valueOf(json.get("OrderOrder").toString());
+            } catch (Exception e){}
+
+            String searchParameters = ApplicationConstants.DEFAULT_PARAMETERS;
+            try {
+                searchParameters = json.get("searchParameters").toString();
+            } catch (Exception e){}
+
+            boolean myItemsInd = ApplicationConstants.DEFAULT_MY_ITEMS_IND;
+            try {
+            	myItemsInd = Boolean.valueOf(json.get("MyItemsInd").toString());
+            	if (myItemsInd && customerId > 0){
+            		if (searchParameters.isEmpty()) {
+                		searchParameters = "customer=" + customerId;
+            		}
+            		else {
+                		searchParameters = searchParameters + "&customer=" + customerId;
+            		}
+            	}
+            } catch (Exception e){}
+
+            if ((searchParameters.contains("&category=") || 
+            		searchParameters.indexOf("category=") == 0)){
+                int categoryDataStartPosition = searchParameters.indexOf("category=");
+
+                if (categoryDataStartPosition > 0){
+                	categoryDataStartPosition = searchParameters.indexOf("&category=") + 1;
+                }
+                
+                categoryDataStartPosition += 9;
+                
+                String[] lstCategory;
+                int categoryDataEndPosition = searchParameters.indexOf("&", categoryDataStartPosition);
+                
+                if (categoryDataEndPosition > -1) {
+                    lstCategory = searchParameters.substring(categoryDataStartPosition, categoryDataEndPosition).split(",");
+                }
+                else {
+                    lstCategory = searchParameters.substring(categoryDataStartPosition).split(",");
+                }
+
+                StringBuilder sbLstCategory = new StringBuilder();
+                Integer categoryId;
+                for (int i = 0; i < lstCategory.length; i++) {
+                	categoryId = Integer.parseInt(lstCategory[i]);
+                	
+                    List<CategoryBean> subCategories = categoryManager.getAllSonCategories(categoryId);
+
+                    if (subCategories != null){
+                        sbLstCategory.append(categoryId);
+                        for (CategoryBean c : subCategories){
+                            sbLstCategory.append(",").append(c.getId());
+                        }
+                    }
+                    
+                    if (i < lstCategory.length - 1) {
+                    	sbLstCategory.append(",");
+                    }
+				}
+
+                
+                if (categoryDataEndPosition > -1) {
+                    searchParameters = searchParameters.substring(0, categoryDataStartPosition) +
+                            sbLstCategory.toString() +
+                            searchParameters.substring(categoryDataEndPosition);
+                }
+                else {
+                    searchParameters = searchParameters.substring(0, categoryDataStartPosition) +
+                            sbLstCategory.toString();
+                }
+            }
+
+            switch(ApplicationConstants.OrderBy.valueOf(orderOption)){
+                case BestMatch:
+            		lstResults = itemManager.getItemsByBestMatch(searchParameters, pageNum, resultsPerPage,
+                                                             customerId, orderOrder);
+                    break;
+                case Distance:
+                    lstResults = itemManager.getItemsByDistance(searchParameters, pageNum, resultsPerPage,
+                            									customerId, orderOrder);
+                    break;
+                case RentCount:
+                    lstResults = itemManager.getItemsByRentCount(searchParameters, pageNum, resultsPerPage,
+																 customerId, orderOrder);
+                    break;
+                case DatePublished:
+                    lstResults = itemManager.getItemsByDatePublished(searchParameters, pageNum, resultsPerPage,
+																	 customerId, orderOrder);
+                    break;
+                case DailyPrice:
+                    lstResults = itemManager.getItemsByDailyPrice(searchParameters, pageNum, resultsPerPage,
+																  customerId, orderOrder);
+                    break;
+                case WeeklyPrice:
+                    lstResults = itemManager.getItemsByWeeklyPrice(searchParameters, pageNum, resultsPerPage,
+																   customerId, orderOrder);
+                    break;
+                case MonthlyPrice:
+                    lstResults = itemManager.getItemsByMonthlyPrice(searchParameters, pageNum, resultsPerPage,
+																	customerId, orderOrder);
+                    break;
+                case Value:
+                    lstResults = itemManager.getItemsByValue(searchParameters, pageNum, resultsPerPage,
+															 customerId, orderOrder);
+                    break;
+                case Rate:
+                    lstResults = itemManager.getItemsByRate(searchParameters, pageNum, resultsPerPage,
+															customerId, orderOrder);
+                    break;
+                default:
+                    throw new Exception("No such order by method exist.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return lstResults;
+    }
+
+//    /**
+//     *
+//     * @param SearchString
+//     * @param PageNum
+//     * @param resultsPerPage
+//     * @return
+//     */
+//    @GET
+//    @Path("/simpleSearch/{all}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> simpleSearch(//@PathParam("CCC") String LoginDetails,
+//                                                   @PathParam("all") String AllString){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.mainSearch(AllString, customerId,
+//                                                ApplicationConstants.OrderByOrder.DESC);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+//
+//    /**
+//     *
+//     * @param SearchString
+//     * @param PageNum
+//     * @param resultsPerPage
+//     * @return
+//     */
+//    @GET
+//    @Path("/ByBestMatch/{searchString}/{pageNum}/{resultsPerPage}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> getBestMatch(//@PathParam("CCC") String LoginDetails,
+//                                                  @PathParam("searchString") String SearchString,
+//                                                  @PathParam("pageNum") int PageNum,
+//                                                  @PathParam("resultsPerPage") int ResultsPerPage){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.getItemsByBestMatch(SearchString, PageNum, ResultsPerPage,
+//                                                customerId, ApplicationConstants.OrderByOrder.DESC);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+//
+//    /**
+//     *
+//     * @param JsonObject
+//     * @return
+//     */
+//    @GET
+//    @Path("/ByRentCount/{searchString}/{pageNum}/{resultsPerPage}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> getRentCount(//@PathParam("CCC") String LoginDetails,
+//                                                   @PathParam("searchString") String SearchString,
+//                                                   @PathParam("pageNum") int PageNum,
+//                                                   @PathParam("resultsPerPage") int ResultsPerPage){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.getItemsByRentCount(SearchString, PageNum, ResultsPerPage,
+//                                                customerId, ApplicationConstants.OrderByOrder.DESC);
+//
+////            json = (JSONObject) new JSONParser().parse(JsonObject);
+////            int pageNum = Integer.parseInt(json.get("pageNum").toString());
+////            int itemsPerPage = Integer.parseInt(json.get("itemsPerPage").toString());
+////
+////            lstNarrowItems = itemManager.getItemsByRentCount(pageNum, itemsPerPage);
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+//
+//    /**
+//     *
+//     * @param SearchString
+//     * @param PageNum
+//     * @param resultsPerPage
+//     * @return
+//     */
+//    @GET
+//    @Path("/ByDistance/{searchString}/{pageNum}/{resultsPerPage}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> getDistance(//@PathParam("CCC") String LoginDetails,
+//                                                  @PathParam("searchString") String SearchString,
+//                                                  @PathParam("pageNum") int PageNum,
+//                                                  @PathParam("resultsPerPage") int ResultsPerPage){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.getItemsByDistance(SearchString, PageNum, ResultsPerPage,
+//                                                customerId, ApplicationConstants.OrderByOrder.DESC);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+//
+//    /**
+//     *
+//     * @param JsonObject
+//     * @return
+//     */
+//    @GET
+//    @Path("/ByDatePublished/{pageNum}/{resultsPerPage}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> getDatePublished(//@PathParam("CCC") String LoginDetails,
+//                                                       @PathParam("searchString") String SearchString,
+//                                                       @PathParam("pageNum") int PageNum,
+//                                                       @PathParam("resultsPerPage") int ResultsPerPage){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.getItemsByDatePublished(SearchString, PageNum, ResultsPerPage,
+//                                                customerId, ApplicationConstants.OrderByOrder.DESC);
+//
+////            json = (JSONObject) new JSONParser().parse(JsonObject);
+////            int pageNum = Integer.parseInt(json.get("pageNum").toString());
+////            int itemsPerPage = Integer.parseInt(json.get("itemsPerPage").toString());
+////
+////            lstItems = itemManager.getItemsByDatePublished(pageNum, itemsPerPage);
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+//
+//    /**
+//     *
+//     * @param JsonObject
+//     * @return
+//     */
+//    @GET
+//    @Path("/Category/{categoryId}/{pageNum}/{resultsPerPage}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public List<ItemListPublicBean> getAllItemsInCategory(//@PathParam("CCC") String LoginDetails,
+//                                                            @PathParam("searchString") String SearchString,
+//                                                            @PathParam("categoryId") int CategoryId,
+//                                                            @PathParam("pageNum") int PageNum,
+//                                                            @PathParam("resultsPerPage") int ResultsPerPage){
+//        JSONObject json = null;
+//
+//        List<ItemListPublicBean> lstNarrowItems = null;
+//
+//        try {
+//            int customerId = 0;
+////            if (!LoginDetails.isEmpty()) {
+////                customerId = customerManager.validateLogin(LoginDetails);
+////            }
+//
+//            lstNarrowItems = itemManager.getItemsOfCategory(CategoryId, /*SearchString, PageNum, ResultsPerPage, */
+//                    customerId, ApplicationConstants.OrderByOrder.DESC);
+//
+////            json = (JSONObject) new JSONParser().parse(JsonObject);
+////            int pageNum = Integer.parseInt(json.get("pageNum").toString());
+////            int itemsPerPage = Integer.parseInt(json.get("itemsPerPage").toString());
+////
+////            lstItems = itemManager.getItemsByDatePublished(pageNum, itemsPerPage);
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//        return lstNarrowItems;
+//    }
+}

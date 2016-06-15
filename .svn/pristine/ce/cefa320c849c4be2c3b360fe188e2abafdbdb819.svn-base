@@ -1,0 +1,46 @@
+<div scroll-glue-top="glued" ng-show="validFilter || myRentsService.inItemRents > -1">
+	<div class="btn-group btn-group-justified" role="group" ng-show="validFilter">
+  		<div class="btn-group" role="group">
+	    	<a ng-href="#/MyRents?p=1&filter=by">
+	    		<button type="button" class="btn btn-default" ng-class="{ active : myRentsService.inBuyerRents }">
+	    			Rents By Me 
+	    		</button>
+    		</a>
+	    </div>
+  		<div class="btn-group" role="group">
+	    	<a ng-href="#/MyRents?p=1&filter=from">
+	    		<button type="button" class="btn btn-default" ng-class="{ active : myRentsService.inSupplierRents }">
+	    			Rents From Me
+    			</button>
+   			</a>
+ 		</div>
+	</div>
+	<div class="text-center" ng-show="myRentsService.inItemRents > -1">
+		<h1><a ng-href="#/ItemDetails/{{myRentsService.inItemRents}}">{{myRentsService.currentItemName}}</a></h1>
+	</div>
+	
+	<form class="form" role="form">
+	    <div class="form-group">
+	        <select class="form-control" ng-options="status as status.display for status in statusList" ng-model="selectedStatus"></select>
+	    </div>
+	</form>
+	<div class="list-group"">
+	    <div ng-if="selectedStatus.option != 'All'" ng-repeat="rent in myRentsService.rents | filter: {statusDescription : selectedStatus.option}">
+  	        <a href ng-click="changeState('details'); getRent(rent.id)" class="list-group-item" ng-class="{ active : currentRentId == rent.id, newRentUpdate :  rent.isNew}">
+	            <h4 class="list-group-item-heading">{{rent.itemName}}</h4>
+	           	<div class="text-left list-group-item-text"><strong>{{rent.statusDescription}}</strong></div>
+	            <div class="text-left list-group-item-text">{{rent.startRent | date:'MM/dd/yyyy'}} <strong>To</strong> {{rent.endRent | date:'MM/dd/yyyy'}}<span ng-show="rent.isNew" class="pull-right badge">New!</span></div>
+	        </a>
+	    </div>
+	    <div ng-if="selectedStatus.option == 'All'" ng-repeat="rent in myRentsService.rents">
+	        <a href ng-click="changeState('details'); getRent(rent.id)" class="list-group-item" ng-class="{ active : currentRentId == rent.id, newRentUpdate :  rent.isNew}">
+	            <h4 class="list-group-item-heading">{{rent.itemName}}</h4>
+	           	<div class="text-left list-group-item-text"><strong>{{rent.statusDescription}}</strong></div>
+	            <div class="text-left list-group-item-text">{{rent.startRent | date:'MM/dd/yyyy'}} <strong>To</strong> {{rent.endRent | date:'MM/dd/yyyy'}}<span ng-show="rent.isNew" class="pull-right badge">New!</span></div>
+	        </a>
+	    </div>
+	</div>
+    <div class="col-md-12 column text-center">
+		<pagination total-items="totalItemsRents()" ng-model="currentPage" ng-change="pageChangedRents()" max-size="maxSize" items-per-page="resultsPerPage"></pagination>
+	</div>
+</div>

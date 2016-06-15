@@ -1,0 +1,376 @@
+package entities;
+
+import org.hibernate.annotations.*;
+import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.NamedNativeQueries;
+import javax.persistence.NamedNativeQuery;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 31/10/14
+ * Time: 13:14
+ * To change this template use File | Settings | File Templates.
+ */
+@Table(name = "Item", schema = "app")
+@Entity
+@NamedQueries({
+        @NamedQuery(name= "Item.RateDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.rate DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Item.RateAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.rate ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name="Item.BestMatchDesc",
+                query="SELECT i " +
+                        "FROM ItemEntity i ",
+//                        "ORDER BY dbo.LevenshteinDistanceCLR(i.ITEMNAME, :searchedItem) DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="false")}),
+        @NamedQuery(name="Item.BestMatchAsc",
+                query="SELECT i " +
+                        "FROM ItemEntity i ",
+//                        "ORDER BY dbo.LevenshteinDistanceCLR(i.ITEMNAME, :searchedItem) DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="false")}),
+        @NamedQuery(name= "Item.RentCountDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.rentCount DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Item.RentCountAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.rentCount ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Item.DatePublishedDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.datePublished DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Item.DatePublishedAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.datePublished ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.DayDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.day DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.DayAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.day ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.WeekDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.week DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.WeekAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.week ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.MonthDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.month DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.MonthAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.month ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.ValueDesc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.value DESC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Price.ValueAsc",
+                query="SELECT i FROM ItemEntity AS i " +
+                "ORDER BY i.thisPrice.value ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+})
+@NamedNativeQueries({
+        @NamedNativeQuery(name="Item.LocationDesc",
+            query="SELECT * " +
+                    "FROM Item i " +
+//                    "WHERE (i.ITEMNAME LIKE :evenParsedString " +
+//                    "OR i.ITEMNAME LIKE :oddParsedString) " +
+//                    "AND dbo.LevenshteinDistanceCLR(i.ITEMNAME, :searchedItem) >= 20.0 " +
+                    "ORDER BY dbo.PointsDistanceCLR(i.POSLATITUDE, i.LONGITUDE," +
+                                                    ":latitude, :longitude) DESC",
+            resultClass = ItemEntity.class,
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedNativeQuery(name="Item.LocationAsc",
+            query="SELECT * " +
+                    "FROM Item i " +
+//                    "WHERE (i.ITEMNAME LIKE :evenParsedString " +
+//                    "OR i.ITEMNAME LIKE :oddParsedString) " +
+//                    "AND dbo.LevenshteinDistanceCLR(i.ITEMNAME, :searchedItem) >= 20.0 " +
+                    "ORDER BY dbo.PointsDistanceCLR(i.POSLATITUDE, i.LONGITUDE," +
+                                                    ":latitude, :longitude) ASC",
+            resultClass = ItemEntity.class,
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")})
+})
+@FilterDefs({
+        @FilterDef(name="minBestMatch", parameters={
+                @ParamDef( name="evenParsedString", type="java.lang.String"),
+                @ParamDef( name="oddParsedString", type="java.lang.String"),
+                @ParamDef( name="searchedString", type="java.lang.String")
+        }),
+        @FilterDef(name="minBestMatchCategory", parameters={
+                @ParamDef( name="evenParsedString", type="java.lang.String"),
+                @ParamDef( name="oddParsedString", type="java.lang.String"),
+                @ParamDef( name="searchedString", type="java.lang.String"),
+                @ParamDef( name="CategoryId", type="java.lang.Integer")
+        }),
+        @FilterDef(name="maxDistance", parameters={
+                @ParamDef( name="latitude", type="java.lang.Double"),
+                @ParamDef( name="longitude", type="java.lang.Double"),
+                @ParamDef( name="maxDistance", type="java.lang.Double")
+        }),
+        @FilterDef(name="Customer", parameters={
+                @ParamDef( name="CustomerId", type="java.lang.Integer" )
+        }),
+        @FilterDef(name="Category", parameters={
+                @ParamDef( name="CategoriesId", type="java.lang.Integer" )
+        }),
+        @FilterDef(name="minRentCount", parameters={
+                @ParamDef( name="rentCount", type="java.lang.Integer" )
+        }),
+        @FilterDef(name="maxRentCount", parameters={
+                @ParamDef( name="rentCount", type="java.lang.Integer" )
+        }),
+        @FilterDef(name="minRate", parameters={
+                @ParamDef( name="rate", type="java.lang.Float" )
+        }),
+        @FilterDef(name="minDaily", parameters={
+                @ParamDef( name="minPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="maxDaily", parameters={
+                @ParamDef( name="maxPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="minWeekly", parameters={
+                @ParamDef( name="minPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="maxWeekly", parameters={
+                @ParamDef( name="maxPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="minMonthly", parameters={
+                @ParamDef( name="minPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="maxMonthly", parameters={
+                @ParamDef( name="maxPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="minValue", parameters={
+                @ParamDef( name="minPrice", type="java.lang.Float")
+        }),
+        @FilterDef(name="maxValue", parameters={
+                @ParamDef( name="maxPrice", type="java.lang.Float")
+        })
+})
+@Filters( {
+        @Filter(name="minBestMatch", condition="(ITEMNAME LIKE :evenParsedString OR ITEMNAME LIKE :oddParsedString) " +
+                                    "AND dbo.LevenshteinDistanceCLR(ITEMNAME, :searchedString) >= 20.0"),
+        @Filter(name="minBestMatchCategory", condition="(ITEMNAME LIKE :evenParsedString OR ITEMNAME LIKE :oddParsedString) " +
+                "AND (dbo.LevenshteinDistanceCLR(ITEMNAME, :searchedString) >= 20.0) AND CATEGORY = :CategoryId"),
+        @Filter(name="maxDistance", condition="dbo.PointsDistanceCLR(POSLATITUDE, LONGITUDE, " +
+                                    ":latitude, :longitude) <= :maxDistance"),
+        @Filter(name="Customer", condition="CUSTOMERID = :CustomerId"),
+        @Filter(name="Category", condition="CATEGORY IN (:CategoriesId)"),
+        @Filter(name="minRentCount", condition="RENTCOUNT >= :rentCount"),
+        @Filter(name="maxRentCount", condition="RENTCOUNT <= :rentCount"),
+        @Filter(name="minRate", condition="RATE >= :rate"),
+        @Filter(name="minDaily", condition="DAILYPRICE >= :minPrice"),
+        @Filter(name="maxDaily", condition="DAILYPRICE <= :maxPrice"),
+        @Filter(name="minWeekly", condition="WEEKLYPRICE >= :minPrice"),
+        @Filter(name="maxWeekly", condition="WEEKLYPRICE <= :maxPrice"),
+        @Filter(name="minMonthly", condition="MONTHLYPRICE >= :minPrice"),
+        @Filter(name="maxMonthly", condition="MONTHLYPRICE <= :maxPrice"),
+        @Filter(name="minValue", condition="VALUE >= :minPrice"),
+        @Filter(name="maxValue", condition="VALUE <= :maxPrice")
+} )
+@SqlResultSetMappings(
+        @SqlResultSetMapping(name = "Item.And.CountRows",
+                entities = {
+                        @EntityResult(entityClass = ItemEntity.class)
+                },
+                columns = {
+                	@ColumnResult(name="ROW_COUNT")
+                }
+        )
+)
+//@Cacheable
+//@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region="item")
+public class ItemEntity {
+    private int id;
+
+    @Column(name = "Id", nullable = false, length = 10)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private CustomerEntity thisCustomer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CustomerId", nullable = false, insertable = true, updatable = true)
+    public CustomerEntity getThisCustomer() {
+        return thisCustomer;
+    }
+
+    public void setThisCustomer(CustomerEntity thisCustomer) {
+        this.thisCustomer = thisCustomer;
+    }
+
+    private String itemName;
+
+    @Column(name = "ItemName", nullable = false, length = 2147483647)
+    @Basic
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    private String description;
+
+    @Column(name = "Description", nullable = false, length = 2147483647)
+    @Basic
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    private CategoryEntity thisCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Category", nullable = false, insertable = true, updatable = true)
+    public CategoryEntity getThisCategory() {
+        return thisCategory;
+    }
+
+    public void setThisCategory(CategoryEntity thisCategory) {
+        this.thisCategory = thisCategory;
+    }
+
+    private int rentCount;
+
+    @Column(name = "RentCount", nullable = false, length = 10)
+    @Basic
+    public int getRentCount() {
+        return rentCount;
+    }
+
+    public void setRentCount(int rentCount) {
+        this.rentCount = rentCount;
+    }
+
+    private boolean availability;
+
+    @Column(name = "Availability", nullable = false, length = 1)
+    @Basic
+    public boolean getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(boolean availability) {
+        this.availability = availability;
+    }
+
+    private Timestamp datePublished;
+
+    @Column(name = "DatePublished", nullable = false, length = 23, precision = 3)
+    @Basic
+    public Timestamp getDatePublished() {
+        return datePublished;
+    }
+
+    public void setDatePublished(Timestamp datePublished) {
+        this.datePublished = datePublished;
+    }
+
+    private float rate;
+
+    @Column(name = "Rate", nullable = false, length = 53)
+    @Basic
+    public float getRate() {
+        return rate;
+    }
+
+    public void setRate(float rate) {
+        this.rate = rate;
+    }
+
+    private int rateCount;
+
+    @Column(name = "RateCount", nullable = false, length = 10)
+    @Basic
+    public int getRateCount() {
+        return rateCount;
+    }
+
+    public void setRateCount(int rateCount) {
+        this.rateCount = rateCount;
+    }
+
+    private PriceEmbeddable thisPrice;
+
+//    @OneToOne (cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+//    @JoinColumn(name = "PRICEID", nullable = false)
+//    @PrimaryKeyJoinColumn
+    @Embedded
+    public PriceEmbeddable getThisPrice() {
+        return thisPrice;
+    }
+
+    public void setThisPrice(PriceEmbeddable thisPrice) {
+        this.thisPrice = thisPrice;
+    }
+
+    private List<RentEntity> rents;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE}, mappedBy = "thisItem")
+    public List<RentEntity> getRents() {
+        return rents;
+    }
+
+    public void setRents(List<RentEntity> rents) {
+        this.rents = rents;
+    }
+
+    public ItemEntity() {
+    }
+
+    public ItemEntity(CustomerEntity thisCustomer,
+                      String itemName,
+                      String description,
+                      CategoryEntity thisCategory,
+                      PriceEmbeddable thisPrice) {
+        this.thisCustomer = thisCustomer;
+        this.itemName = itemName;
+        this.description = description;
+        this.thisCategory = thisCategory;
+        this.thisPrice = thisPrice;
+    }
+
+    @PrePersist
+    private void setConstants(){
+        this.rentCount = 0;
+        this.availability = true;
+        this.datePublished = new Timestamp(new Date().getTime());
+        this.rate = Float.intBitsToFloat(0);
+        this.rateCount = 0;
+    }
+}

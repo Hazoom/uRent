@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="css/triangle.css">
+
+  <script>
+    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+    e.src='//www.google-analytics.com/analytics.js';
+    r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+    ga('create','UA-7489188-1');ga('send','pageview');
+  </script>
+</head>
+
+<body>
+  <div id="container">
+    <div class="content">
+      <h2>The basic bubble variants</h2>
+      <p class="triangle-right">This only needs one HTML element.</p>
+      <p class="triangle-right top">For example, <code>&lt;p&gt;[text]&lt;/p&gt;</code>.</p>
+      <p class="triangle-right left">But it could be any element you want.</p>
+      <p class="triangle-right right">The entire appearance is created only with CSS.</p>
+    </div>
+  </div>
+</body>
+</html>

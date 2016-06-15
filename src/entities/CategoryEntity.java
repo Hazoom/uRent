@@ -1,0 +1,160 @@
+package entities;
+
+import org.hibernate.annotations.*;
+//import org.hibernate.annotations.Cache;
+
+import java.util.List;
+
+import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 31/10/14
+ * Time: 13:14
+ * To change this template use File | Settings | File Templates.
+ */
+@Table(name = "Category", schema = "app")
+@Entity
+@NamedQueries({
+        @NamedQuery(name= "Category.All",
+                query="SELECT c FROM CategoryEntity AS c",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Category.CategoryNameDesc",
+                query="SELECT c FROM CategoryEntity AS c " + //, CategoryEntity AS c1 " +
+//                "WHERE (c.id = c1.id AND c.parentId is null) OR c.parentId.id = c1.id " +
+                "ORDER BY c.categoryname ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")}),
+        @NamedQuery(name= "Category.Parent",
+                query="SELECT c FROM CategoryEntity AS c " +
+                        "WHERE c.parentId is null " +
+                        "ORDER BY c.categoryname ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")})
+})
+@FilterDefs({
+        @FilterDef(name="parent", parameters={
+                @ParamDef( name="parent", type="java.lang.Integer")
+        }),
+        @FilterDef(name="categoryName", parameters={
+            @ParamDef( name="name", type="java.lang.String")
+})
+})
+@Filters( {
+        @Filter(name="parent", condition="PARENTCATEGORY = :parent"),
+        @Filter(name="categoryName", condition="CATEGORYNAME = :name")
+} )
+//@Cacheable
+//@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region="category")
+public class CategoryEntity {
+    private int id;
+
+    @Column(name = "ID", nullable = false, length = 10)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private String categoryname;
+
+    @Column(name = "CATEGORYNAME", nullable = false, length = 50)
+    @Basic
+    public String getCategoryname() {
+        return categoryname;
+    }
+
+    public void setCategoryname(String categoryname) {
+        this.categoryname = categoryname;
+    }
+
+//    private CategoryEntity parentId;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "PARENTCATEGORY")
+//    public CategoryEntity getParentId() {
+//        return parentId;
+//    }
+//
+//    public void setParentId(CategoryEntity parentId) {
+//        this.parentId = parentId;
+//    }
+
+    private Integer parentId;
+
+    @Column(name = "PARENTCATEGORY")
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+
+//    private List<CategoryEntity> sonCategories;
+//
+//    @OneToMany(fetch = FetchType.LAZY, mappedBy = "parentId")
+////    @OrderBy("categoryname")
+//    public List<CategoryEntity> getSonCategories() {
+//        return sonCategories;
+//    }
+//
+//    public void setSonCategories(List<CategoryEntity> sonCategories) {
+//        this.sonCategories = sonCategories;
+//    }
+
+    private List<ItemEntity> items;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE}, mappedBy = "thisCategory")
+    public List<ItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemEntity> items) {
+        this.items = items;
+    }
+
+    public CategoryEntity() {
+    }
+
+    public CategoryEntity(String categoryname, Integer parentId) {
+        this.categoryname = categoryname;
+        this.parentId = parentId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CategoryEntity that = (CategoryEntity) o;
+
+        if (id != that.id) return false;
+        if (!categoryname.equals(that.categoryname)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + categoryname.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "CategoryEntity{" +
+                "id=" + id +
+                ", categoryname='" + categoryname + '\'' +
+                '}';
+    }
+}

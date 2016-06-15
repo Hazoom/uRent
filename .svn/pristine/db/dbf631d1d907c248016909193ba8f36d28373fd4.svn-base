@@ -1,0 +1,18 @@
+<div ng-show="isOwner">
+	<a role="button" class="btn-primary btn-lg round pull-right" ng-href="#/MyRents?p=1&itemId={{selectedItem.id}}">
+		<i class="fa fa-list-ul"></i> Rents
+	</a>
+</div>
+
+<ul class="nav nav-tabs">
+    <li ng-class="{ active : getTab() == 1 }"><a href ng-click="setTab(1)">Description</a></li>
+    <li ng-class="{ active : getTab() == 2 }"><a href ng-click="setTab(2)">Specification</a></li>
+    <li ng-class="{ active : getTab() == 3 }"><a href ng-click="setTab(3)"><span class="glyphicon glyphicon-comment"></span> Reviews</a></li>
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <itemdescription-directive ng-show="getTab() == 1" class="tab-pane active"></itemdescription-directive>
+    <itemspecs-directive ng-show="getTab() == 2" class="tab-pane active"></itemspecs-directive>
+    <itemreviews-directive ng-show="getTab() == 3" class="tab-pane active"></itemreviews-directive>
+</div>

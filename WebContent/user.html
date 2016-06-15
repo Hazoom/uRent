@@ -1,0 +1,20 @@
+<div ng-controller="UserController" ng-init="init()" class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-3 column" ui-view>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{user.firstName}} {{user.lastName}}</h3>
+                </div>
+                <ul class="fa-ul margintop10">
+                    <li ng-class="{ active2 : getTab() == 1 }" class="active"><i class="fa-li fa fa-user"></i><b><a ng-href="#/User/{{user.id}}">Details</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 2 }"><i class="fa-li fa fa-comments"></i><b><a ng-href="#/User/{{user.id}}?tab=2">Buyer feedback</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 3 }"><i class="fa-li fa fa-comments"></i><b><a ng-href="#/User/{{user.id}}?tab=3">Supplier feedback</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 4 }"><i class="fa-li fa fa-shopping-cart"></i><b><a ng-href="#/User/{{user.id}}?p=1&tab=4">Items</a></b></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 column">
+            <userbody-directive></userbody-directive>
+        </div>
+    </div>
+</div>

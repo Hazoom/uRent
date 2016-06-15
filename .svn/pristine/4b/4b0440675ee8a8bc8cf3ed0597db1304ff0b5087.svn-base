@@ -1,0 +1,51 @@
+<div class="container" style="text-align: left;">
+	<div class="col-md-10 col-md-offset-1 column">
+	    <ol id="breadcrumb" class="breadcrumb round">
+	        <li><a href="#"><i class="fa fa-home"></i></a></li>
+	        <li><a href="#/categories/{{getCurrentCategory()}}?p=1" ng-click="init()">{{getCurrentCategory()}}</a></li>
+	        <li ng-if="getCurrentSubCategory().length > 0"><a href="#/categories/{{getCurrentCategory()}}/{{getCurrentSubCategory()}}?p=1" ng-click="init()">{{getCurrentSubCategory()}}</a></li>
+	    </ol>
+	    <div class="well well-sm">
+	        <div class="pull-right">
+	            <form class="form-inline" role="form">
+	                <div ng-if="getCurrentSubCategory().length > 0" class="form-group">
+	                    <select class="form-control" ng-options="sort as sort.display for sort in sorts" ng-change="loadItemsBySubCategory(selectedOrder)" ng-model="selectedOrder">
+	                    </select>
+	                </div>
+	                <div ng-if="getCurrentSubCategory().length == 0" class="form-group">
+	                    <select class="form-control" ng-options="sort as sort.display for sort in sorts" ng-change="loadItemsByCategory(selectedOrder)" ng-model="selectedOrder">
+	                    </select>
+	                </div>
+	          </form>
+	        </div>
+	        <div class="visible-lg">
+		        <div class="btn-group">
+		            <a href ng-click="setCurrentView(1)" id="list" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"> </span> List</a>
+		            <a href ng-click="setCurrentView(2)" id="grid" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> Grid</a>
+		        </div>
+	        </div>
+	        <div class="hidden-lg">
+		        <div class="btn-group btn-group-justified">
+		            <a href ng-click="setCurrentView(1)" id="list" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th-list"> </span> List</a>
+		            <a href ng-click="setCurrentView(2)" id="grid" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-th"></span> Grid</a>
+		        </div>
+	        </div>
+	    </div>
+	
+	    <div ui-view>
+	        <div ng-if="getCurrentView() == 1">
+	            <itemlist-directive>
+	            </itemlist-directive>
+	        </div>
+	        <div ng-if="getCurrentView() == 2">
+	            <itemgrid-directive>
+	            </itemgrid-directive>
+	        </div>
+	    </div>
+	
+	    <div class="col-md-12 column text-center">
+	    	<pagination total-items="totalItemsCategory()" ng-model="$parent.currentPage" ng-change="pageChangedCategory()" max-size="maxSize"></pagination>
+	    </div>
+	</div>
+</div>
+

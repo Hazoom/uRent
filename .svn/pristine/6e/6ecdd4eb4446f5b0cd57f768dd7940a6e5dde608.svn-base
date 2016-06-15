@@ -1,0 +1,230 @@
+
+	<div class="col-md-12 column productboxmain">
+  		<div class="row">
+     		<div class="col-md-4 col-xs-12 column">
+      			<i>Rent for</i><h3 class="text-center"><a href="#/ItemDetails/{{selectedRent.itemId}}">{{selectedRent.itemName}}</a></h3>
+ 			</div>
+ 			<div class="col-md-5 col-xs-12 column up-down-5-padding text-center" >
+				<a href ng-if="currentRentStatus == 0 && inSupplierRents && !cancelState" ng-click="approve(currentRentId)" class="btn-success btn-sm" role="button">
+					<span class="glyphicon glyphicon-ok"></span> 
+						Approve
+				</a>
+				
+				<a href ng-if="(currentRentStatus == 0 || currentRentStatus == 1) && !cancelState" ng-click="changeState('cancel')" class="btn-danger btn-sm" role="button">
+		           		<span class="glyphicon glyphicon-remove"></span> 
+		           			Cancel Rent
+				</a>
+ 			</div>
+    		<div class="col-md-3 col-xs-12 column">
+     			<table class="table table-condensed table-bordered borderless">
+     				<tbody>
+     					<tr>
+     						<td>Opened: {{selectedRent.dateOpened | date:'MM/dd/yyyy'}}</td>
+     					</tr>
+     					<tr>
+     						<td>Updated: {{selectedRent.dateUpdated | date:'MM/dd/yyyy'}}</td>
+     					</tr>
+     				</tbody>
+     			</table>
+ 			</div>
+      	</div>
+      	<table class="table table-condensed">
+      		<tbody>
+      			<tr>
+      				<td>
+			        	<h4><a href="#/User/{{selectedRent.otherId}}"><span class="glyphicon glyphicon-user"></span> {{selectedRent.otherName}}</a></h4>
+			        	<div class="row clearfix">
+			        		<div class="col-md-9">
+			        			<h4><span class="glyphicon glyphicon-calendar"></span> Requested from {{selectedRent.startRent | date:'MM/dd/yyyy'}} <strong>to </strong>{{selectedRent.endRent | date:'MM/dd/yyyy'}}</h4>
+				           	</div>
+				        	<div class="col-md-3 text-center" ng-if="selectedRent.statusId <= 1 && selectedRent.isBuyer && !selectedRent.itemDescriptionPreRent">
+				            	<button ng-controller="DatePickerController as datePickerCtrl" ng-click="pick()" type="button" class="btn-primary btn-sm">
+				            		<span class="glyphicon glyphicon-refresh"></span> 
+				            		Change rent dates
+			            		</button>
+				           	</div>
+			        	</div>
+       				</td>
+      			</tr>
+		    	<tr>
+		        	<td>Current status is <strong>{{selectedRent.statusDescription}}</strong></td>
+	   		 	</tr>
+		        <tr>
+		        	<td ng-if="selectedRent.cancellationReason">
+        				<div><b>Reason of cancellation: </b></div>
+        				<div>"{{selectedRent.cancellationReason}}"</div>
+					</td>
+				</tr>
+		        <tr>
+		        	<td ng-if="selectedRent.itemDescriptionPreRent">
+        				<div><b>Description of the item before this rent: </b></div>
+        				<div>"{{selectedRent.itemDescriptionPreRent}}"</div>
+					</td>
+				</tr>
+		    </tbody>
+		</table>
+		
+       	<div ng-if="selectedRent.statusId == 1">
+        	<div ng-if="selectedRent.isBuyer">
+				<span ng-if="!selectedRent.itemDescriptionPreRent" class="col-md-6">
+	   				<label for="itemDescription">Enter the item description before accepting rent:</label>
+		        	<textarea class="form-control non-resizable" rows="3" id="itemDescription" ng-model="myRentsService.itemDescriptionOnScreen"></textarea>
+	        		<button ng-click="submitItemDescriptionPreRent()" type="button" class="btn-primary btn-sm up-down-5-padding">Submit description</button>
+				</span>
+        		<span ng-if="selectedRent.itemDescriptionPreRent">
+        			<h5><b>Waiting for supplier to start rent</b></h5>
+        		</span>
+			</div>
+        	<div ng-if="!selectedRent.isBuyer">
+	        	<div ng-if="selectedRent.itemDescriptionPreRent">
+	        		<button ng-click="startRent()" type="button" class="btn-success btn-sm">Start rent</button>
+	        	</div>
+	        	<div ng-if="!selectedRent.itemDescriptionPreRent">
+	        		<h5><b>Buyer need to enter description before rent start officially</b></h5>
+	        	</div>
+        	</div>
+		</div>
+		
+       	<div ng-if="selectedRent.statusId == 2">
+        	<div ng-if="selectedRent.isBuyer">
+        		<h5><b>Notice that only supplier can end rent officially</b></h5>
+        	</div>
+        	<div ng-if="!selectedRent.isBuyer">
+        		<button ng-click="endRent()" type="button" class="btn-success btn-sm">End rent</button>
+        	</div>
+       	</div>
+       	
+       	<div ng-if="selectedRent.statusId == 3">
+        	<div ng-if="selectedRent.isBuyer">
+        		<div ng-if="!selectedRent.supplierRate">
+		        	<div class="panel panel-default">
+						<div class="panel-heading">
+					    	<h3 class="panel-title">Please say what do you think about this rent</h3>
+					  	</div>
+						<div class="panel-body">
+					  		<form class="form-horizontal">
+						  		<div class="form-group">
+						    		<label class="col-md-2 text-left control-label">About the supplier </label>
+						    		<div class="col-md-6">
+			        		  			<label>Rate: </label><rating ng-model="myRentsService.supplierRate" readonly=false></rating>
+						      			<textarea class="form-control non-resizable" rows="3" id="supplierFeedback" ng-model="myRentsService.supplierFeedback"></textarea>
+						      			<div class="alert alert-danger" ng-show="myRentsService.noSupplierRate">Supplier rate is required</div>
+						      			<div class="alert alert-danger" ng-show="myRentsService.noSupplierFeedback">Supplier feedback is required</div>
+						    		</div>
+					    		</div>
+					    		<hr>
+						  		<div class="form-group">
+						    		<label class="col-md-2 text-left control-label">About the item </label>
+						    		<div class="col-md-6">
+			        		  			<label>Rate: </label><rating ng-model="myRentsService.itemRate" readonly=false></rating>
+						      			<textarea class="form-control non-resizable" rows="3" id="itemFeedback" ng-model="myRentsService.itemFeedback"></textarea>
+						      			<div class="alert alert-danger" ng-show="myRentsService.noItemRate">Item rate is required</div>
+						      			<div class="alert alert-danger" ng-show="myRentsService.noItemFeedback">Item feedback is required</div>
+						    		</div>
+					    		</div>
+		        				<button ng-click="submitFeedback()" type="button" class="btn-primary btn-sm center-block">Submit feedback</button>
+				    		</form>
+					  	</div>
+					</div>
+        		</div>
+        		<div ng-if="!selectedRent.buyerFeedback && selectedRent.supplierFeedback && selectedRent.itemFeedback">
+	        		<h5><b>Your feedback was accepted but we haven't got feedback of supplier yet</b></h5>
+        		</div>
+        	</div>
+        	<div ng-if="!selectedRent.isBuyer">
+        		<div ng-if="!selectedRent.buyerRate">
+		        	<div class="panel panel-default">
+						<div class="panel-heading">
+					    	<h3 class="panel-title">Please say what do you think about this rent</h3>
+					  	</div>
+					  	<div class="panel-body">
+					  		<form class="form-horizontal">
+							  	<div class="form-group">
+							    	<label class="col-md-2 text-left control-label">About the buyer </label>
+							    	<div class="col-md-6">
+				        		  		<label>Rate: </label><rating ng-model="myRentsService.buyerRate" readonly=false></rating>
+							      		<textarea class="form-control non-resizable" rows="3" id="buyerFeedback" ng-model="myRentsService.buyerFeedback"></textarea>
+							      		<div class="alert alert-danger" ng-show="myRentsService.noBuyerRate">Buyer rate is required</div>
+						      			<div class="alert alert-danger" ng-show="myRentsService.noBuyerFeedback">Buyer feedback is required</div>
+							    	</div>
+						    	</div>
+			        			<button ng-click="submitFeedback()" type="button" class="btn-primary btn-sm center-block">Submit feedback</button>
+				    		</form>
+					  	</div>
+					</div>
+        		</div>
+        		<div ng-if="!selectedRent.supplierFeedback && !selectedRent.itemFeedback && selectedRent.buyerFeedback">
+	        		<h5><b>Your feedback was accepted but we haven't got feedback of buyer yet</b></h5>
+        		</div>
+        	</div>
+       	</div>
+        	
+       	<div ng-if="selectedRent.statusId == 4 && selectedRent.isBuyer">
+	       	<div class="jumbotron" ng-if="selectedRent.buyerRate">
+	       		<h4>Feedback and rating on you</h4>
+	       		<div>
+		        	<div><rating ng-model="selectedRent.buyerRate" readonly=true></rating></div>
+		        	<div><span>"{{selectedRent.buyerFeedback}}"</span></div>
+	       		</div>
+	       	</div>
+       	</div>
+       	
+       	<div ng-if="selectedRent.statusId == 4 && !selectedRent.isBuyer">
+	       	<div class="jumbotron" ng-if="selectedRent.supplierRate && selectedRent.itemRate">
+	       		<h4>Feedback and rating on you</h4>
+	       		<div>
+		        	<div><rating ng-model="selectedRent.supplierRate" readonly=true></rating></div>
+		        	<div><span>"{{selectedRent.supplierFeedback}}"</span></div>
+	       			<h4>Feedback and rating on the item</h4>
+		        	<div><rating ng-model="selectedRent.itemRate" readonly=true></rating></div>
+		        	<div><span>"{{selectedRent.itemFeedback}}"</span></div>
+	       		</div>
+	       	</div>
+       	</div>
+	</div>
+
+<div ng-controller="DatePickerController">
+    <script type="text/ng-template" id="DatesForRent.html">
+        <div ng-show="loggedIn" ng-init="init()">
+            <div class="modal-header">
+                <h3 class="modal-title">Choose Rent Dates</h3>
+            </div>
+            <div class="modal-body">
+                <form name="rentDatesForm" id="rentDatesForm" novalidate role="form">
+                    <h4>Rent From</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="startRentDT" ng-change="startRentChanged(); calcDaysAndPrice()" is-open="startRentOpened" min-date="minDate" datepicker-options="dateOptions" ng-required="true" show-button-bar=false />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="startRentOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <h4>To</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="{{format}}" ng-model="endRentDT" ng-change="calcDaysAndPrice()" is-open="endRentOpened" min-date="startRentDT" datepicker-options="dateOptions" ng-required="true" show-button-bar=false />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="endRentOpen($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <pre>Rent for {{totalDays}} days. Total {{totalPayment}}$</pre>
+                </form>
+            </div>
+            <div class="modal-footer">
+				<div ng-show="myRentsService.failStatus > 0" class="pull-left">
+               		<div class="alert alert-danger">{{myRentsService.requestFailureReason}}</div>
+				</div>
+                <button class="btn-success btn-sm" ng-click="ok(); rentDatesForm.$submitted = true;">OK</button>
+                <button class="btn-danger btn-sm" ng-click="cancel()">Cancel</button>
+            </div>
+        </div>
+    </script>
+</div>

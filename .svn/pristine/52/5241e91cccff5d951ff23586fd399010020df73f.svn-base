@@ -1,0 +1,10 @@
+<div class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-4 column">
+	  		<renttabs-directive></renttabs-directive>
+  		</div>
+        <div class="col-md-8 column">
+	    	<myrentsbody-directive></myrentsbody-directive>
+    	</div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+<div class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-3 column">
+            <!-- <categories-directive>
+            </categories-directive> 
+              <bodyleftwells-directive>
+            </bodyleftwells-directive> -->
+        </div>
+        <div ng-controller="ShowItemsController" ng-init="init(); initCurrentPage(); loadItemsBySubCategory()" class="container" style="text-align: left;">
+            <div ng-include src="'productlist.html'"></div>
+        </div>
+    </div>
+</div>

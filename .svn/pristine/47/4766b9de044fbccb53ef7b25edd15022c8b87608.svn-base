@@ -1,0 +1,40 @@
+<div ng-controller="UserController" ng-init="verifyStr()" class="container  margintop20" style="text-align: left;">
+    <div class="row">
+    	<div class="well well-sm">
+	        <div ng-show="initPassword.wrong" style="text-align: center;">
+	            <div class="row">
+	                <label><b>We can't authenticate you. try again from the beginning</b></label>
+	            </div>
+	        </div>
+	        <div ng-show="!initPassword.wrong && initPassword.afterSubmit" style="text-align: center;">
+	            <div class="row">
+	                <label><b>Critical Error occurred. Please try again</b></label>
+	            </div>
+	        </div>
+        <form ng-init="setFormScope(this)" ng-if="!initPassword.afterSubmit && !initPassword.wrong" name="initPasswordForm" id="initPasswordForm" novalidate valid-submit="sendInitPasswordForm()" role="form">
+            <div class="form-group clearfix" ng-class="{
+                        'has-error': initPasswordForm.$submitted && initPasswordForm.NewPassword.$invalid,
+                        'has-success': initPasswordForm.$submitted && initPasswordForm.NewPassword.$valid}">
+                <label class="col-lg-2 control-label" for="NewPassword">New Password</label>
+                <div class="col-lg-5">
+                    <input id="NewPassword" name="NewPassword" type="password" class="form-control" ng-model="initPassword.NewPassword" ng-change="checkValidityInitPasswordForm()" required autofocus/>
+                    <div class="alert alert-danger" ng-show="initPasswordForm.$submitted && initPasswordForm.NewPassword.$error.required">Password is required</div>
+                </div>
+            </div>
+            <div class="form-group clearfix" ng-class="{
+                        'has-error': initPasswordForm.$submitted && initPasswordForm.RewriteNewPassword.$invalid,
+                        'has-success': initPasswordForm.$submitted && initPasswordForm.RewriteNewPassword.$valid}">
+                <label class="col-lg-2 control-label" for="RewriteNewPassword">Rewrite New Password</label>
+                <div class="col-lg-5">
+                    <input id="RewriteNewPassword" name="RewriteNewPassword" type="password" class="form-control" ng-model="initPassword.RewriteNewPassword" ng-change="checkValidityInitPasswordForm()" required />
+                    <div class="alert alert-danger" ng-show="initPasswordForm.$submitted && initPasswordForm.RewriteNewPassword.$error.same">Passwords don't match</div>
+                </div>
+            </div>
+            <div class="form-group margintop10">
+                <div class="col-lg-10 col-lg-offset-2 text-center">
+                    <button type="submit" class="btn-primary btn-sm" ng-disabled="initPasswordForm.$invalid">Change Password</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

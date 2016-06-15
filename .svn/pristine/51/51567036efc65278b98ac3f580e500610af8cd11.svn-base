@@ -1,0 +1,208 @@
+<ol id="breadcrumb" class="breadcrumb round">
+    <li><a href="#"><i class="fa fa-home"></i></a></li>
+    <li><a>Advanced Search</a></li>
+    <li><a>Find Items</a></li>
+</ol>
+
+<div class="well well-sm">
+	<div ng-if="serverError" class="form-group clearfix" style="text-align: center;"">
+		<div class="alert alert-success">Critical Error occurred. Please try again!</div>
+	</div>
+     <form ng-if="!afterSearch" name="findItemsForm" id="findItemsForm" valid-submit="sendfindItemsForm()" novalidate role="form">
+         <div class="form-group clearfix">
+             <div class="row">
+              <label class="col-sm-2 control-label" for="keywords">Key Words</label>
+              <div class="col-sm-5">
+                  <input id="keywords" name="keywords" class="form-control" type="text" ng-model="advancedsearch.keywords" autofocus/>
+              </div>
+             </div>
+         </div>
+         <div class="form-group clearfix">
+         	<div class="row">
+              <label class="col-sm-2 control-label" for="selectedCategory">Category</label>
+              <div class="col-sm-4">
+                  <select ui-select2="multi" id="selectedCategory" name="selectedCategory" ng-model="advancedsearch.selectedCategory">
+                  	<optgroup ng-repeat="category in categories" label="{{category.name}}">
+               	  		<option ng-repeat="sub in category.subCategories" value="{{sub.id}}">{{sub.name}}</option>
+           	  		</optgroup>
+       	  		  </select>
+              </div>
+             </div>
+         </div>
+        	<div class="form-group clearfix">
+        		<div class="text-center productprice">
+        		</div>
+         </div>
+         <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Daily Price</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+               	<label for="fromday">From:</label>
+                   <input id="fromday" name="fromday" class="form-control" type="text" ng-model="advancedsearch.fromday" autofocus/>
+            </div>
+           </div>
+                 <div class="col-sm-3">
+            <div class="form-group">
+               	<label for="today">To:</label>
+                   <input id="today" name="today" class="form-control" type="text" ng-model="advancedsearch.today" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+ 	        <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Weekly Price</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+               	<label for="fromweek">From:</label>
+                   <input id="fromweek" name="fromweek" class="form-control" type="text" ng-model="advancedsearch.fromweek" autofocus/>
+            </div>
+           </div>
+                 <div class="col-sm-3">
+            <div class="form-group">
+               	<label for="toweek">To:</label>
+                   <input id="toweek" name="toweek" class="form-control" type="text" ng-model="advancedsearch.toweek" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+       	    <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Monthly Price</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+               	<label for="frommonth">From:</label>
+                   <input id="frommonth" name="frommonth" class="form-control" type="text" ng-model="advancedsearch.frommonth" autofocus/>
+            </div>
+           </div>
+                 <div class="col-sm-3">
+            <div class="form-group">
+               	<label for="tomonth">To:</label>
+                   <input id="tomonth" name="tomonth" class="form-control" type="text" ng-model="advancedsearch.tomonth" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Value</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+               	<label for="fromvalue">From:</label>
+                   <input id="fromvalue" name="fromvalue" class="form-control" type="text" ng-model="advancedsearch.fromvalue" autofocus/>
+            </div>
+           </div>
+                 <div class="col-sm-3">
+            <div class="form-group">
+               	<label for="tovalue">To:</label>
+                   <input id="tovalue" name="tovalue" class="form-control" type="text" ng-model="advancedsearch.tovalue" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div class="form-group clearfix">
+        		<div class="text-center productprice">
+        		</div>
+         </div>
+         <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Located Within (KM)</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+            	<input id="maxDistance" name="maxDistance" class="form-control" type="text" ng-model="advancedsearch.maxDistance" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div class="form-group clearfix">
+        		<div class="text-center productprice">
+        		</div>
+         </div>
+    	    <div class="form-group clearfix">
+             <div class="row">
+             	<div class="col-sm-12">
+            <div class="form-group">
+                <label>Rent Count</label>
+            </div>
+           </div>
+          </div>
+             <div class="row">
+             	<div class="col-sm-offset-2 col-sm-3">
+            <div class="form-group">
+               	<label for="fromrent">From:</label>
+                   <input id="fromrent" name="fromrent" class="form-control" type="text" ng-model="advancedsearch.fromrent" autofocus/>
+            </div>
+           </div>
+                 <div class="col-sm-3">
+            <div class="form-group">
+               	<label for="torent">To:</label>
+                   <input id="torent" name="torent" class="form-control" type="text" ng-model="advancedsearch.torent" autofocus/>
+            </div>
+           </div>
+          </div>
+         </div>
+         <div class="form-group clearfix">
+        		<div class="text-center productprice">
+        		</div>
+         </div>
+         <div class="form-group clearfix">
+         	<div class="row">
+              <label class="col-sm-2 control-label" for="selectedCategory">Rate from</label>
+              <div class="col-sm-4">
+                  <select id="selectedRate" name="selectedRate" ng-model="advancedsearch.selectedRate">
+                      <option ng-selected="{{rate.id == 0}}" ng-repeat="rate in rates" value="{{rate.id}}">{{rate.name}}</option>
+                  </select>
+              </div>
+             </div>
+         </div>
+         <div class="form-group margintop10">
+         	<div class="row">
+              <div class="col-lg-10 text-center">
+                  <button ng-click="makeStringSearchAdvanced()" type="submit" class="btn-primary btn-sm" ng-disabled="(findItemsForm.$submitted && findItemsForm.$invalid)">
+        			  <i class="glyphicon glyphicon-search"></i>
+        			  Search
+         		  </button>
+                  <button class="btn-warning btn-sm" ng-click="clear()">
+        			  <i class="glyphicon glyphicon-trash"></i>
+                 	  Clear All
+                  </button>
+              </div>
+             </div>
+             </div>
+         </div>
+         <div class="form-group clearfix">
+         	<div class="alert alert-danger" ng-if="emptySearch">Hey, you can't search nothing!</div>
+        </div>
+     </form>
+</div>

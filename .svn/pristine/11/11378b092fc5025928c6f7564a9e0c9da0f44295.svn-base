@@ -1,0 +1,19 @@
+<ul class="nav nav-pills nav-stacked">
+    <li class="active"><a href="#"><i class="fa fa-home"></i> Home</a></li>
+    <li ng-repeat="category in categoriesLst">
+        <a href="" id="category-{{category.id}}" ng-click="toggleExpanded(category.id)" ng-class="{ 'active-bg-color' : category.expanded, 'non-active-bg-color' : !category.expanded }" class="collapse" id="menu-group-{{category.name}}" data-toggle="collapse" data-target="#sub-menu-{{category.name}}"><i class="fa fa-ellipsis-v"></i> {{category.name}}</a>
+        <div class="collapse" data-parent="menu-group-{{category.name}}" id="sub-menu-{{category.name}}">
+            <ul class="nav nav-pills">
+           		<div class="clearfix">
+	                <li class="submenu">
+	                    <a id="category-{{category.id}}-all" ng-click="close()" href="#/categories/{{category.name}}?p=1"><i class="fa fa-arrow-right"></i> {{category.name}}</a>
+	                </li>
+	                <hr class="up-down-5-padding">
+	                <li class="submenu up-down-5-padding" ng-repeat="sonCategory in category.subCategories">
+	                    <a id="category-{{sonCategory.id}}" ng-click="close()" href="#/categories/{{category.name}}/{{sonCategory.name}}?p=1"><i class="fa fa-long-arrow-right"></i> {{sonCategory.name}}</a>
+	                </li>
+				</div>
+            </ul>
+        </div>
+    </li>
+</ul>

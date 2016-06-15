@@ -1,0 +1,34 @@
+<ol id="breadcrumb" class="breadcrumb">
+    <li><a href="#"><i class="glyphicon glyphicon-home"></i></a></li>
+    <li><a>My Area</a></li>
+    <li><a>My Account</a></li>
+</ol>
+
+<table class="table table-condensed table-hover">
+    <tbody>
+    <tr>
+        <td>First Name:</td>
+        <td>{{user.FirstName}}</td>
+    </tr>
+    <tr>
+        <td>Last Name:</td>
+        <td>{{user.LastName}}</td>
+    </tr>
+    <tr>
+        <td>Joined Date:</td>
+        <td>{{user.DateJoined | date:'medium'}}</td>
+    </tr>
+    <tr>
+        <td>Last Login:</td>
+        <td>{{user.LastLogin | date:'medium'}}</td>
+    </tr>
+    <tr>
+        <td>Rate as Buyer:</td>
+        <td>{{user.RateBuyer}}/5 from {{user.RateBuyerCount}} rates</td>
+    </tr>
+    <tr>
+        <td>Rate as Supplier:</td>
+        <td>{{user.RateSupplier}}/5 from {{user.RateSupplierCount}} rates</td>
+    </tr>
+    </tbody>
+</table>

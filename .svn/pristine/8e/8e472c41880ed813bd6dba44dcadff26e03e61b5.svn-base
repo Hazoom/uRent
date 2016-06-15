@@ -1,0 +1,312 @@
+'use strict';
+    //var app = angular.module('uRent', ['ngRoute', 'item-directives', 'addMember-directives', 'ui.bootstrap', 'myarea-directives']);
+
+    var app = angular.module('uRent', ['ngRoute', 'ui.router', 'ui.bootstrap', 'ngAside', 'angularFileUpload', 'ngWebsocket', 'luegg.directives', 'angular-loading-bar']);
+
+    app.config(function($stateProvider, $urlRouterProvider, $locationProvider, $compileProvider) {
+
+    	$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|local|data|chrome-extension):/);
+        $urlRouterProvider.otherwise('/');
+//        $locationProvider.html5Mode(true);
+        $stateProvider.
+//            state('index', {
+//                url: '/',
+//                templateUrl: 'index.html'
+//            }).
+            state('MyArea', {
+                url: '/MyArea?p?tab?action?itemId',
+                templateUrl: 'myArea.html'
+            }).
+            state('AddMember', {
+                url: '/AddMember',
+                templateUrl: 'addMember.html'
+            }).
+            state('User', {
+                url: '/User/:customerId?p=1?tab',
+                templateUrl: 'user.html'
+            }).
+            state('ForgotPassword', {
+                url: '/ForgotPassword',
+                templateUrl: 'forgotPassword.html'
+            }).
+            state('InitPassword', {
+                url: '/InitPassword/:str',
+                templateUrl: 'initPassword.html'
+            }).
+            state('ItemDetails', {
+                url: '/ItemDetails/:itemId',
+                templateUrl: 'product.html'
+            }).
+            state('MyItems', {
+                url: '/MyItems',
+                templateUrl: 'myItems.html'
+            }).
+            state('EditAccount', {
+                url: '/EditAccount',
+                templateUrl: 'editAccount.html'
+            }).
+            state('AddItem', {
+                url: '/AddItem',
+                templateUrl: 'addItem.html'
+            }).
+            state('Terms', {
+                url: '/Terms',
+                templateUrl: 'terms.html'
+            }).
+            state('About', {
+                url: '/About',
+                templateUrl: 'about.html'
+            }).
+            state('Contact', {
+                url: '/Contact',
+                templateUrl: 'contact.html'
+            }).
+            state('TopRated', {
+                url: '/TopRated',
+                templateUrl: 'topRated.html'
+            }).
+            state('categories', {
+                url: '/categories/:category?p',
+                templateUrl: 'categories.html'
+            }).
+            state('categories/:category', {
+                url: '/categories/:category/:sonCategory?p',
+                templateUrl: 'categories_sub.html'
+            }).
+            state('Messages', {
+                url: '/Messages',
+                templateUrl: 'messages.html'
+            }).
+            state('MyRents', {
+                url: '/MyRents?p?filter?itemId',
+                templateUrl: 'myRents.html'
+            }).
+            state('Rent', {
+                url: '/Rent/:rentId',
+                templateUrl: 'rent.html'
+            }).
+            state('advanced', {
+                url: '/advanced?tab',
+                templateUrl: 'advanced.html'
+            }).
+            state('search', {
+                url: '/search/?q?p?category?minDaily?maxDaily?minWeekly?maxWeekly?minMonthly?maxMonthly?minValue?maxValue?minRentCount?maxRentCount?minRate?maxDistance?units',
+                templateUrl: 'search.html',
+                controller : "SearchController"
+            }).
+            state('contact', {
+                url: '/contact',
+                templateUrl: 'contact.html'
+            }).
+            state('about', {
+                url: '/about',
+                templateUrl: 'about.html'
+            }).
+            state('terms', {
+                url: '/terms',
+                templateUrl: 'terms.html'
+            }).
+            state('privacy', {
+                url: '/privacy',
+                templateUrl: 'privacy.html'
+            });
+    });
+    
+    app.config(['cfpLoadingBarProvider', function(cfpLoadingBarProvider) {
+//      cfpLoadingBarProvider.includeBar = false;
+//      cfpLoadingBarProvider.includeSpinner = false;
+      cfpLoadingBarProvider.latencyThreshold = 500;
+    }])
+    
+    app.directive('datepickerPopup', function (dateFilter, datepickerPopupConfig) {
+    	  return {
+    		    restrict: 'A',
+    		    priority: 1,
+    		    require: 'ngModel',
+    		    link: function(scope, element, attr, ngModel) {
+    		      var dateFormat = attr.datepickerPopup || datepickerPopupConfig.datepickerPopup;
+    		      ngModel.$formatters.push(function (value) {
+    		        return dateFilter(value, dateFormat);
+    		      });
+    		    }
+    		  };
+	});
+    
+//    app.factory('WebSocket', function ($websocket) {
+//        var ws = $websocket.$new({
+//            url: 'ws://localhost:8080/echo',
+//            lazy: true,
+//            reconnect: true,
+//            enqueue: true,
+//            mock: true
+//        });
+//        
+//        return ws;
+//
+//        ws.$on('$open', function () {
+//            console.log('Oh my gosh, websocket is really open! Fukken awesome!');
+//
+//            ws.$emit('ping', 'hi listening websocket server'); // send a message to the websocket server
+//
+//            var data = {
+//                level: 1,
+//                text: 'ngWebsocket rocks!',
+//                array: ['one', 'two', 'three'],
+//                nested: {
+//                    level: 2,
+//                    deeper: [{
+//                        hell: 'yeah'
+//                    }, {
+//                        so: 'good'
+//                    }]
+//                }
+//            };
+//
+//            ws.$emit('pong', data);
+//        });
+//
+//        ws.$on('pong', function (data) {
+//            console.log('The websocket server has sent the following data:');
+//            console.log(data);
+//
+//            ws.$close();
+//        });
+//
+//        ws.$on('$close', function () {
+//            console.log('Noooooooooou, I want to have more fun with ngWebsocket, damn it!');
+//        });
+//    });
+
+    app.service("MainService" , function() {
+        var MainService = {
+            homePage : true,
+
+            setHomePage : function(bHomePage) {
+                MainService.homePage = bHomePage;
+            },
+
+            isUndefinedOrNull: function(obj) {
+                return !angular.isDefined(obj) || obj == null;
+            }
+
+        }
+
+        return MainService;
+    });
+
+    app.controller("MainController", function($scope, $http, LoginService, CategoriesService, MainService, RentsService, MessagesService){
+    	
+//        $scope.ws = new WebSocket("ws://localhost:8080/echo");
+//        $scope.ws.onmessage = function (evt)
+//        {
+//            alert ("got Rent!")
+//        };
+        
+        $scope.init = function() {
+            
+            LoginService.init($http);
+            $scope.myLoginService = LoginService;
+            CategoriesService.getAllCategories($http);
+        };
+
+        $scope.isHomePage = function() {
+            return MainService.homePage;
+        }
+
+        $scope.setHomePage = function(bHomePage) {
+            MainService.setHomePage(bHomePage);
+        }
+    });
+
+    app.controller("LoginController", function($scope, LoginService) {
+
+        $scope.logOut = function() {
+            LoginService.logOut();
+            $scope.myLoginService = LoginService;
+        };
+    });
+
+    app.controller('LoginModalController', function ($scope, $http, $modal) {
+
+        $scope.open = function (size) {
+
+            var modalInstance = $modal.open({
+                templateUrl: 'loginModal.html',
+                controller: 'LoginModalInstanceCtrl',
+                windowClass: 'modal',
+                overflow: 'hidden',
+                size: size,
+                resolve: {
+                }
+            });
+
+            modalInstance.result.then(function () {
+            });
+        };
+    });
+
+    app.controller('LoginModalInstanceCtrl', function ($scope, $http, $modalInstance, LoginService) {
+
+        $scope.ok = function () {
+            LoginService.login($scope.email, $scope.pwd, $scope.rememberMe, $http, $modalInstance);
+            $scope.myLoginService = LoginService;
+        }
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        }
+    });
+
+    app.controller('SearchModalController', function ($scope, $http, $modal) {
+
+        $scope.open = function (size) {
+
+            var modalInstance = $modal.open({
+                templateUrl: 'searchModal.html',
+                controller: 'SearchModalInstanceCtrl',
+                windowClass: 'modal',
+                overflow: 'hidden',
+                size: size,
+                resolve: {
+                }
+            });
+
+            modalInstance.result.then(function () {
+            });
+        };
+    });
+    
+    app.controller('SearchModalInstanceCtrl', function ($scope, $http, $modalInstance) {
+
+        $scope.close = function () {
+            $modalInstance.close();
+        }
+    });
+    
+    app.directive("validSubmit", [ "$parse", function($parse) {
+        return {
+            // we need a form controller to be on the same element as this directive
+            // in other words: this directive can only be used on a <form>
+            require: 'form',
+            // one time action per form
+            link: function(scope, element, iAttrs, form) {
+                form.$submitted = false;
+                // get a hold of the function that handles submission when form is valid
+                var fn = $parse(iAttrs.validSubmit);
+
+                // register DOM event handler and wire into Angular's lifecycle with scope.$apply
+                element.on("submit", function(event) {
+                    scope.$apply(function() {
+                        // on submit event, set submitted to true (like the previous trick)
+                        form.$submitted = true;
+                        // if form is valid, execute the submission handler function and reset form submission state
+                        if (form.$valid) {
+                            fn(scope, { $event : event });
+                            form.$submitted = false;
+                        }
+                    });
+                });
+            }
+        };
+    }
+    ]);

@@ -1,0 +1,67 @@
+<ol id="breadcrumb" class="breadcrumb">
+    <li><a href="#"><i class="glyphicon glyphicon-home"></i></a></li>
+    <li><a>My Area</a></li>
+    <li><a>Edit Account</a></li>
+</ol>
+
+<div class="well well-sm">
+    <div class="row">
+        <div ng-if="member.serverError" style="text-align: center;">
+            <div class="row">
+                <label><b>Critical Error occurred. Please try again</b></label>
+            </div>
+        </div>
+        <div ng-if="member.success" style="text-align: center;">
+            <div class="row">
+                <label><b>Updated your details successfully!</b></label>
+            </div>
+        </div>
+        <form ng-if="!member.afterEditMember"  name="editMemberForm" id="editMemberForm" valid-submit="sendForm()" novalidate role="form">
+            <div class="form-group clearfix" ng-class="{
+                        'has-error': editMemberForm.$submitted && editMemberForm.Email.$invalid,
+                        'has-success': editMemberForm.$submitted && editMemberForm.Email.$valid}">
+                <label class="col-lg-2 control-label" for="Email">Email</label>
+                <div class="col-lg-5">
+                    <input disabled=true id="Email" name="Email" class="form-control" type="email" ng-model="member.Email" required autofocus/>
+                    <div class="alert alert-danger" ng-if="editMemberForm.$submitted && editMemberForm.Email.$error.required">Email is required</div>
+                    <div class="alert alert-danger" ng-if="member.userExists">User already exists</div>
+                </div>
+            </div>
+            <div class="form-group clearfix" ng-class="{
+                                'has-error': editMemberForm.$submitted && editMemberForm.firstName.$invalid,
+                                'has-success': editMemberForm.$submitted && editMemberForm.firstName.$valid}">
+                <label class="col-lg-2 control-label" for="firstName">First Name</label>
+                <div class="col-lg-3">
+                    <input id="firstName" name="firstName" class="form-control" type="text" ng-model="member.firstName" required autofocus/>
+                    <div class="alert alert-danger" ng-if="editMemberForm.$submitted && editMemberForm.firstName.$error.required">First name is required</div>
+                </div>
+            </div>
+            <div class="form-group clearfix" ng-class="{
+                                'has-error': editMemberForm.$submitted && editMemberForm.lastName.$invalid,
+                                'has-success': editMemberForm.$submitted && editMemberForm.lastName.$valid}">
+                <label class="col-lg-2 control-label" for="lastName">Last Name</label>
+                <div class="col-lg-3">
+                    <input id="lastName" name="lastName" class="form-control" type="text" ng-model="member.lastName" required autofocus/>
+                    <div class="alert alert-danger" ng-if="editMemberForm.$submitted && editMemberForm.lastName.$error.required">Last name is required</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="googleMap">Place</label>
+                <div class="col-lg-10">
+                    <div class="col-md-10">
+                        <div ng-controller="MyAreaController" ng-init="initMap()" id="googleMap" class="googlemap-box"></div>
+                        <input id="searchBox" class="controls googlemap-search" type="text" placeholder="Search Box">
+                    </div>
+                </div>
+            </div>
+            <div ng-if="member.notPlace" class="col-lg-10">
+                <div class="alert alert-danger">Place is required</div>
+            </div>
+            <div class="form-group margintop10">
+                <div class="col-lg-10 col-lg-offset-2 text-center">
+                    <button type="submit" class="btn-primary btn-sm" ng-disabled="(editMemberForm.$submitted && editMemberForm.$invalid)">Edit Details</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

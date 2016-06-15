@@ -1,0 +1,68 @@
+<div ng-repeat="rows in getChunkedItems()">
+    <div ng-repeat="item in rows">
+        <div class="col-md-4 column productbox">
+            <a ng-href="#/ItemDetails/{{item.id}}">
+            	<img ng-if="item.mainPhoto" ng-src="data:image/jpeg;base64,{{item.mainPhoto}}" width="250" height="250" alt="Product Image">
+           	</a>
+            <a ng-href="#/ItemDetails/{{item.id}}">
+            	<img ng-if="!item.mainPhoto" src="img/no_image_available.jpg" width="250" height="250" alt="Product Image">
+           	</a>
+			<a href="#/User/{{item.ownerId}}">
+				<span class="glyphicon glyphicon-user"></span> {{item.ownerName}}
+			</a>
+            <div class="producttitle">{{item.name}}</div>
+            <div class="action">
+                <div ng-if="item.rate == 0">
+                    <b>Rating:</b> <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 0 && item.rate <= 0.5">
+                    <b>Rating:</b> <i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 0.5 && item.rate <= 1">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 1 && item.rate <= 1.5">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 1.5 && item.rate <= 2">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 2 && item.rate <= 2.5">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 2.5 && item.rate <= 3">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 3 && item.rate <= 3.5">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 3.5 && item.rate <= 4">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i>
+                </div>
+                <div ng-if="item.rate > 4 && item.rate < 4.5">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i>
+                </div>
+                <div ng-if="item.rate >= 4.5">
+                    <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i>
+                </div>
+            </div>
+            <div class="productprice">
+                <div class="pricetext" ng-if="!item.dailyPrice">Daily: N/A</div>
+                <div class="pricetext" ng-if="item.dailyPrice">Daily: ${{item.dailyPrice}}</div>
+                <div class="pricetext" ng-if="!item.weeklyPrice">Weekly: N/A</div>
+                <div class="pricetext" ng-if="item.weeklyPrice">Weekly: ${{item.weeklyPrice}}</div>
+                <div class="pricetext" ng-if="!item.monthlyPrice">Monthly: N/A</div>
+                <div class="pricetext" ng-if="item.monthlyPrice">Monthly: ${{item.monthlyPrice}}</div>
+                <div class="pricetext" ng-if="!item.value">Value: N/A</div>
+                <div class="pricetext" ng-if="item.value">Value: ${{item.value}}</div>
+            </div>
+            <div class="productprice">
+	           	<div class="text-center" >
+	           		<a ng-href="#/ItemDetails/{{item.id}}" class="btn-primary btn-sm" role="button">
+		           		<span class="glyphicon glyphicon-shopping-cart"></span> 
+		           			Details
+	         		</a>
+		       	</div>
+        	</div>
+    </div>
+</div>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>E-commerce Template</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!--link rel="stylesheet/less" href="less/bootstrap.less" type="text/css" /-->
+<!--link rel="stylesheet/less" href="less/responsive.less" type="text/css" /-->
+<!--script src="js/less-1.3.3.min.js"></script-->
+<!--append ��#!watch�� to the browser URL, then refresh the page. -->
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<link href="css/animate.css" rel="stylesheet">
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+    <![endif]-->
+
+<!-- Fav and touch icons -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/apple-touch-icon-144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/apple-touch-icon-114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/apple-touch-icon-72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-57-precomposed.png">
+<link rel="shortcut icon" href="img/favicon.png">
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/scripts.js"></script>
+</head>
+
+<body>
+
+
+<div class="container">
+  <div class="row clearfix">
+    <div class="col-md-4 column"> <a href="index.html"><img src="img/uglogo.png" class="img-responsive" id="logo" alt=""></a> </div>
+    <div class="col-md-8 column">
+      <div class="account">
+        <button type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon-pencil"></span> My Account</button>
+        <button type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon glyphicon-briefcase"></span> Sign In</button>
+        <button type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon-credit-card"></span> Checkout</button>
+      </div>
+      <div class="basket"> <span class="glyphicon glyphicon-shopping-cart"></span><a href="basket.html"> <b>Your Basket</b> 0 items - &pound;0.00</a> </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid darkgreen" >
+  <div class="container" >
+    <div class="row clearfix">
+      <div class="col-md-12 column" >
+        <nav class="navbar navbar-default" role="navigation" >
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                                data-target="#bs-example-navbar-collapse-1"><span
+                                class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span
+                                class="icon-bar"></span><span class="icon-bar"></span></button>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <div class="col-md-9 column">
+              <ul class="nav navbar-nav">
+              <li> <a href="index.html">HOME</a> </li>
+                <li> <a href="typography.html">ABOUT US</a> </li>
+                <li> <a href="productlist.html">PRODUCTS</a> </li>
+				<li> <a href="typography.html">TYPOGRAPHY</a> </li>
+                <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown">DROPDOWN <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>
+                <li> <a href="#">CONTACT US</a> </li>
+              </ul>
+            </div>
+            <div class="col-md-3 column">
+              <form class="navbar-form" role="search">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Search" name="q">
+                  <div class="input-group-btn">
+                    <button class="btnsearch btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row clearfix">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12 col-md-10 col-md-offset-1">
+          <h1>Basket</h1>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">Total</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="col-sm-8 col-md-6"><div class="media"> <a class="thumbnail pull-left" href="#"> <img class="media-object" src="img/product1.jpg" style="width: 72px; height: 72px;" alt="Alt Tag"> </a>
+                    <div class="media-body">
+                      <h4 class="media-heading"><a href="#">Product name</a></h4>
+                      <h5 class="media-heading"> by <a href="#">Brand name</a></h5>
+                      <span>Status: </span><span class="text-success"><strong>In Stock</strong></span> </div>
+                  </div></td>
+                <td class="col-sm-1 col-md-1" style="text-align: center"><input type="email" class="form-control" id="exampleInputEmail1" value="3"></td>
+                <td class="col-sm-1 col-md-1 text-center"><strong>&pound;4.87</strong></td>
+                <td class="col-sm-1 col-md-1 text-center"><strong>&pound;14.61</strong></td>
+                <td class="col-sm-1 col-md-1"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-remove"></span> Remove </button></td>
+              </tr>
+              <tr>
+                <td class="col-md-6"><div class="media"> <a class="thumbnail pull-left" href="#"> <img class="media-object" src="img/product1.jpg" style="width: 72px; height: 72px;" alt="Alt Tag"> </a>
+                    <div class="media-body">
+                      <h4 class="media-heading"><a href="#">Product name</a></h4>
+                      <h5 class="media-heading"> by <a href="#">Brand name</a></h5>
+                      <span>Status: </span><span class="text-warning"><strong>Leaves warehouse in 2 - 3 weeks</strong></span> </div>
+                  </div></td>
+                <td class="col-md-1" style="text-align: center"><input type="email" class="form-control" id="exampleInputEmail2" value="2"></td>
+                <td class="col-md-1 text-center"><strong>&pound;4.99</strong></td>
+                <td class="col-md-1 text-center"><strong>&pound;9.98</strong></td>
+                <td class="col-md-1"><button type="button" class="btn btn-danger"> <span class="glyphicon glyphicon-remove"></span> Remove </button></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><h5>Subtotal</h5></td>
+                <td class="text-right"><h5><strong>&pound;24.59</strong></h5></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><h5>Estimated shipping</h5></td>
+                <td class="text-right"><h5><strong>&pound;6.94</strong></h5></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><h3>Total</h3></td>
+                <td class="text-right"><h3><strong>&pound;31.53</strong></h3></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><button type="button" class="btn btn-default"> <span class="glyphicon glyphicon-shopping-cart"></span> Continue Shopping </button></td>
+                <td><button type="button" class="btn btn-primary"> Checkout <span class="glyphicon glyphicon-play"></span> </button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid bottomback margintop10">
+  <div class="container"> </div>
+</div>
+<div class="container">
+  <div class="row clearfix">
+    <div class="col-md-3 column">
+      <h3>ONLINE SHOP</h3>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis tortor arcu, quis molestie tortor dictum et. </div>
+    <div class="col-md-3 column">
+      <h3>FOLLOW US</h3>
+      <a href="#"><span class="fa-stack fa-lg"> <i class="fa fa-square-o fa-stack-2x"></i> <i class="fa fa-twitter fa-stack-1x"></i> </span> Twitter</a><br>
+      <a href="#"><span class="fa-stack fa-lg"> <i class="fa fa-square-o fa-stack-2x"></i> <i class="fa fa-facebook fa-stack-1x"></i> </span> Facebook</a><br>
+      <a href="#"><span class="fa-stack fa-lg"> <i class="fa fa-square-o fa-stack-2x"></i> <i class="fa fa-google-plus fa-stack-1x"></i> </span> Google+</a><br>
+    </div>
+    <div class="col-md-3 column">
+      <h3>CONTACT INFO</h3>
+      1 The Street,
+      Alpha Road,
+      Gamma Town,
+      Countrysville,
+      
+      X43 32A 
+     <br>
+<br>
+
+      <strong>Telephone:</strong> 0909 111 2233 <br>
+      <strong>E-Mail:</strong> sales@theshop.com
+      </div>
+    <div class="col-md-3 column">
+    
+     <h3>MAILING LIST</h3>
+                
+                <form action="#" method="post">
+                    <div class="input-prepend"><span class="add-on"><i class="icon-envelope"></i></span>
+                        <input type="text" id="email" name="" placeholder="your@email.com">
+                    </div>
+                    <br />
+                    <input type="submit" value="Subscribe Now!" class="btn" />
+              </form>
+          
+
+       </div>
+  </div>
+</div>
+<div class="container-fluid bottomfooter">
+  <div class="container"> Terms of Service  - Privacy Policy  -   Contact Us  -  Support & FAQ </div>
+</div>
+</body>
+</html>

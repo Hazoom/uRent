@@ -1,0 +1,189 @@
+
+app.controller('MessagesController', function($scope, $http, MessagesService, CookiesService) {
+
+    $scope.myMessagesService = MessagesService;
+    this.messageBody = "";
+
+//    $scope.init = function() {
+//        var ccc = CookiesService.getCookie("ccc");
+//        MessagesService.getUserMessages(ccc, $http);
+//    }
+
+    $scope.getGeneralMessages = function() {
+        var ccc = CookiesService.getCookie("ccc");
+        MessagesService.getGeneralMessages(ccc, $http);
+    }
+
+    $scope.getGeneralMessageConversation = function(messageId) {
+        var ccc = CookiesService.getCookie("ccc");
+        MessagesService.getGeneralMessageConversation(ccc, $http, messageId);
+    }
+
+    $scope.replyMessage = function() {
+        var ccc = CookiesService.getCookie("ccc");
+        MessagesService.replyMessage(ccc, $http, this.messageBody);
+        
+        this.messageBody = "";
+    }
+
+    $scope.getNewMessagesCount = function() {
+        var ccc = CookiesService.getCookie("ccc");
+        MessagesService.getNewMessagesCount(ccc, $http);
+    }
+});
+
+app.service('MessagesService', function(RentsService) {
+
+    var MessagesService = this;
+    MessagesService.generalMessages = [];
+    MessagesService.conversation = [];
+    MessagesService.newUserMessagesCount = "0";
+    MessagesService.rentId = -1;
+
+//    MessagesService.getUserMessages = function(ccc, $http) {
+//
+//        var data = { "CCC" : ccc};
+//        return $http.post('urent/MessageService/AllIncomingForUser', data).then(function(result) {
+//        	for (var i = 0; i < result.length; i++){
+//	    		if (result[i].content.length > 30){
+//	    			result[i].content = result[i].content.substring(1, 30) + "...";
+//	    		}
+//        	}
+//    		
+//    		MessagesService.userMessages = result.data;
+//        });
+//    }
+    
+    MessagesService.getGeneralMessages = function(ccc, $http) {
+    	var data = { "CCC" : ccc};
+    	return $http.post('urent/MessageService/GeneralMessages', data).then(function(result) {
+    		for (var i = 0; i < result.length; i++){
+    			if (result[i].content.length > 30){
+	    			result[i].content = result[i].content.substring(1, 30) + "...";
+	    		}
+	      	}
+	  		
+	  		MessagesService.generalMessages = result.data;
+    	});
+    }
+
+    MessagesService.getGeneralMessageConversation = function(ccc, $http, messageId) {
+
+        var data = { "CCC" : ccc, "MessageId" : messageId};
+        return $http.post('urent/MessageService/GeneralMessageConversation', data).then(function(result) {
+        	var CRUDconversation = result.data;
+        	var minutesAgo;
+        	
+        	for (var i = 0; i < CRUDconversation.length; i++){
+        		minutesAgo = (new Date() - result.data[i].dateSent)/1000/60;
+        		
+        		if (minutesAgo < 1){
+        			CRUDconversation[i].timeAgo = "Less than a minute";
+        		} 
+        		else if (minutesAgo < 60){
+        			CRUDconversation[i].timeAgo = minutesAgo + "minutes";
+        		} else if (minutesAgo < 60 * 24){
+        			CRUDconversation[i].timeAgo = Math.round(minutesAgo / 60) + "hours";
+        		} else if (minutesAgo < 60 * 24 * 10){
+        			CRUDconversation[i].timeAgo = Math.round(minutesAgo / 60 / 24) + "days";
+        		} else {
+        			CRUDconversation[i].timeAgo = "Long time";
+        		}
+
+    			CRUDconversation[i].timeAgo = CRUDconversation[i].timeAgo + " ago";
+        	}
+        	
+            MessagesService.conversation = [];
+            MessagesService.conversation = CRUDconversation;
+        });
+    }
+
+    MessagesService.getRentConversation = function(ccc, $http, rentId, rentStatus) {
+
+        var data = { "CCC" : ccc, "RentId" : rentId};
+        MessagesService.rentId = rentId;
+        return $http.post('urent/MessageService/Conversation', data).then(function(result) {
+        	var CRUDconversation = result.data;
+        	var minutesAgo;
+        	
+        	for (var i = 0; i < CRUDconversation.length; i++){
+        		minutesAgo = (new Date() - result.data[i].dateSent)/1000/60;
+        		
+        		if (minutesAgo < 1){
+        			CRUDconversation[i].timeAgo = "Less than a minute";
+        		} 
+        		else if (minutesAgo < 60){
+        			CRUDconversation[i].timeAgo = Math.floor(minutesAgo) + " minutes";
+        		} else if (minutesAgo < 60 * 24){
+        			CRUDconversation[i].timeAgo = Math.floor(minutesAgo / 60) + " hours";
+        		} else if (minutesAgo < 60 * 24 * 10){
+        			CRUDconversation[i].timeAgo = Math.floor(minutesAgo / 60 / 24) + " days";
+        		} else {
+        			CRUDconversation[i].timeAgo = "Long time";
+        		}
+
+    			CRUDconversation[i].timeAgo = CRUDconversation[i].timeAgo + " ago";
+        	}
+        	
+        	MessagesService.allowChat = (rentStatus == 1 || rentStatus == 2);
+            MessagesService.conversation = [];
+            MessagesService.conversation = CRUDconversation;
+        });
+    }
+
+    MessagesService.replyMessage = function(ccc, $http, messageBody) {
+
+//    	if (MessagesService.conversation.length > 0){
+//            var parentMessage = MessagesService.conversation[MessagesService.conversation.length - 1];
+//            
+//            var data = { "CCC" : ccc, "ParentMessage" : parentMessage.id, "Subject" : parentMessage.subject, "Content" : messageBody,
+//                    "Recipient" : parentMessage.receiverId, "Sender" : parentMessage.senderId};
+//    	}
+//    	else{
+            var data = { "CCC" : ccc, "Content" : messageBody, "RentId" : MessagesService.rentId};
+//    	}
+
+        return $http.post('urent/MessageService/Reply', data).then(function(result) {
+        	var CRUDMessage = result.data;
+    		var minutesAgo = (new Date() - result.data.dateSent)/1000/60;
+    		
+    		if (minutesAgo < 1){
+    			CRUDMessage.timeAgo = "Less than a minute";
+    		} 
+    		else if (minutesAgo < 60){
+    			CRUDMessage.timeAgo = Math.floor(minutesAgo) + " minutes";
+    		} else if (minutesAgo < 60 * 24){
+    			CRUDMessage.timeAgo = Math.floor(minutesAgo / 60) + " hours";
+    		} else if (minutesAgo < 60 * 24 * 10){
+    			CRUDMessage.timeAgo = Math.floor(minutesAgo / 60 / 24) + " days";
+    		} else {
+    			CRUDMessage.timeAgo = "Long time";
+    		}
+
+    		CRUDMessage.timeAgo = CRUDMessage.timeAgo + " ago";
+			
+        	MessagesService.conversation.push(CRUDMessage);
+        });
+    }
+
+    MessagesService.initUserMessagesCount = function(ccc, $http) {
+        var data = { "CCC" : ccc};
+        return $http.post('urent/MessageService/NewIncomingCount', data).then(function(result) {
+
+            var count = result.data.Count;
+            if (count > 0) {
+                //$("#userMessages").toggleClass("waiting");
+
+                count = "" + count;
+                if (count.length > 4){
+                    count = ">9999";
+                }
+
+                //$("#newUserMessages").text(count + " new messages");
+                $("#newUserMessagesCount").text(count);
+                //$("#newUserMessages").css("background-color", "#b7001a");
+//                MessagesService.newUserMessagesCount = count;
+            }
+        });
+    }
+});

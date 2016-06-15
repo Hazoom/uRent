@@ -1,0 +1,70 @@
+<div class="col-md-9 column">
+    <div class="col-md-4 column productbox"> <img src="img/product1.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-8 column productbox"> <img src="img/product1w.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product2.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product3.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product4.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product5.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product6.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-4 column productbox"> <img src="img/product7.jpg" class="img-responsive" alt="Product Image">
+        <div class="producttitle">Product Name</div>
+        <div class="productprice">
+            <div class="pull-right"><a href="product.html" class="btn btn-danger btn-sm" role="button"><span class="glyphicon glyphicon-shopping-cart"></span> BUY</a></div>
+            <div class="pricetext">$8.95</div>
+        </div>
+    </div>
+    <div class="col-md-8 column productbox">
+        <h1>Welcome</h1>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis tortor arcu, quis molestie tortor dictum et. Etiam rhoncus in nibh sed lobortis. Aliquam euismod ligula turpis, nec auctor eros lacinia vitae.<br>
+        <br>
+        Curabitur aliquam, quam a feugiat gravida, tortor risus pulvinar velit, ut faucibus lectus ligula eget magna. Vivamus et nisi at urna condimentum vehicula non eget nibh. Phasellus ut viverra nunc, sed pellentesque massa. Nulla consectetur lobortis iaculis. Mauris luctus dolor libero, eu iaculis dolor tempus id. In hac habitasse platea dictumst. Quisque fermentum odio ut urna gravida cursus. <br>
+        <br>
+        Cras rutrum, nisl nec pharetra rutrum, erat enim rutrum metus, varius commodo sapien eros mattis dolor. Vestibulum suscipit nunc eu metus auctor dignissim. Cras a purus consequat, porta nunc sed, viverra nibh. Aliquam erat volutpat. </div>
+    <div class="col-md-4 column productbox">
+        <h1>News</h1>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis tortor arcu, quis molestie tortor dictum et. Etiam rhoncus in nibh sed lobortis. Aliquam euismod ligula turpis, nec auctor eros lacinia vitae.<br>
+        <br>
+        Curabitur aliquam, quam a feugiat gravida, tortor risus pulvinar velit, ut faucibus lectus ligula eget magna. Vivamus et nisi at urna condimentum vehicula non eget nibh. Phasellus ut viverra nunc. </div>
+</div>

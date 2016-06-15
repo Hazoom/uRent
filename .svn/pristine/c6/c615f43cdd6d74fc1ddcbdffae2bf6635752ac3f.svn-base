@@ -1,0 +1,458 @@
+package bl;
+
+import dao.CategoryDAO;
+import dao.CustomerDAO;
+import dao.ItemDAO;
+import dao.RentDAO;
+
+import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import application.ApplicationConstants;
+import exportBeans.*;
+import exportBeans.Abstract.ItemDetailsSuperBean;
+import exportBeans.Abstract.ItemListSuperBean;
+import exportBeans.Public.ItemDetailsPublicBean;
+import exportBeans.Public.ItemListPublicBean;
+import exportBeans.Public.RentDetailsPublicBean;
+import entities.ItemPhotoEntity;
+import org.jboss.resteasy.plugins.providers.multipart.InputPart;
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 05/12/14
+ * Time: 11:38
+ * To change this template use File | Settings | File Templates.
+ */
+@Path("/ItemService")
+@Stateless
+public class ItemBL {
+
+    @EJB
+    private ItemDAO itemManager;
+
+    @EJB
+    private CustomerDAO customerManager;
+
+    @EJB
+    private RentDAO rentManager;
+
+    @EJB
+    private CategoryDAO categoryManager;
+
+    public ItemBL(){
+    }
+    
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/addItem")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addItem(String JsonObject){
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            String itemName = json.get("ItemName").toString();
+            
+            String description = "";
+            
+            try {
+            	description = json.get("Description").toString();
+            } catch (Exception ex) {
+            }
+            
+            int categoryId = Integer.parseInt(json.get("CategoryId").toString());
+
+            JSONArray photoIds = (JSONArray) new JSONParser().parse(json.get("PhotoIds").toString());
+
+            HashMap<String, String> lstPhotoIds = new HashMap<String, String>();
+            JSONObject tempJSON;
+
+            for (int i = 0; i < photoIds.size(); i++){
+                tempJSON = (JSONObject) photoIds.get(i);
+                lstPhotoIds.put(tempJSON.get("photoId").toString(),
+                                tempJSON.get("uploadStatus").toString());
+            }
+
+            Float dailyPrice = null;
+            try {
+                dailyPrice = Float.parseFloat(json.get("DailyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float weeklyPrice = null;
+            try {
+                weeklyPrice = Float.parseFloat(json.get("WeeklyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float monthlyPrice = null;
+            try {
+                monthlyPrice = Float.parseFloat(json.get("MonthlyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float value = null;
+            try {
+                value = Float.parseFloat(json.get("Value").toString());
+            } catch (Exception ex) {
+            }
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    itemManager.addItem(customerId, itemName, description, categoryId,
+                            dailyPrice, weeklyPrice, monthlyPrice, value, lstPhotoIds)){
+            }
+
+            response = 0;
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+    
+    /**
+    *
+    * @param JsonObject
+    * @return
+    */
+   @POST
+   @Path("/none")
+   @Produces(MediaType.APPLICATION_JSON)
+   public String none(String JsonObject){
+       JSONObject json = null;
+
+       int response = 0;
+
+       JSONObject obj=new JSONObject();
+       obj.put("Response",response);
+       StringWriter out = new StringWriter();
+       try {
+           obj.writeJSONString(out);
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       String jsonText = out.toString();
+
+       return jsonText;
+   }
+
+    /**
+     *
+     * @param input
+     * @return
+     */
+    @POST
+    @Path("/uploadPhoto")
+    @Consumes({MediaType.MULTIPART_FORM_DATA})
+    public String uploadPhotos(MultipartFormDataInput input) {
+        int itemPhotoId = -1;
+        Map<String, List<InputPart>> formParts = input.getFormDataMap();
+        StringBuilder CCCBuilder = new StringBuilder();
+
+        try {
+            if (formParts.size() == 89) {
+                for (int i = 0; i < 88; i++) {
+                    List<InputPart> lstChar =  formParts.get(String.valueOf(i));
+                    InputStream inputStream = lstChar.get(0).getBody(InputStream.class, null);
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+                    int reads = inputStream.read();
+                    while(reads != -1) {
+                        outputStream.write(reads);
+                        reads = inputStream.read();
+                    }
+
+                    CCCBuilder = CCCBuilder.append(outputStream.toString());
+                }
+
+                String loginDetails = CCCBuilder.toString();
+
+                int customerId;
+
+                if ((customerId = customerManager.validateLogin(loginDetails)) != 0) {
+                    itemPhotoId = itemManager.addItemPhoto(customerId, -1, formParts.get("file").get(0));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Id",itemPhotoId);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/updateItem")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateItem(String JsonObject){
+    	
+        JSONObject json = null;
+
+        int response = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int itemId = Integer.parseInt(json.get("ItemId").toString());
+            String itemName = json.get("ItemName").toString();
+            String description = json.get("Description").toString();
+            int categoryId = Integer.parseInt(json.get("CategoryId").toString());
+            boolean availability = Boolean.parseBoolean(json.get("Availability").toString());
+
+            JSONArray photoIds = (JSONArray) new JSONParser().parse(json.get("PhotoIds").toString());
+
+            HashMap<String, String> lstPhotoIds = new HashMap<String, String>();
+            JSONObject tempJSON;
+
+            for (int i = 0; i < photoIds.size(); i++){
+                tempJSON = (JSONObject) photoIds.get(i);
+                lstPhotoIds.put(tempJSON.get("photoId").toString(),
+                                tempJSON.get("uploadStatus").toString());
+            }
+
+            Float dailyPrice = null;
+            try {
+                dailyPrice = Float.parseFloat(json.get("DailyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float weeklyPrice = null;
+            try {
+                weeklyPrice = Float.parseFloat(json.get("WeeklyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float monthlyPrice = null;
+            try {
+                monthlyPrice = Float.parseFloat(json.get("MonthlyPrice").toString());
+            } catch (Exception ex) {
+            }
+
+            Float value = null;
+            try {
+                value = Float.parseFloat(json.get("Value").toString());
+            } catch (Exception ex) {
+            }
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    itemManager.updateItem(itemId, itemName, description, categoryId, availability,
+                            dailyPrice, weeklyPrice, monthlyPrice, value, lstPhotoIds)){
+            }
+
+            response = 0;
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/deleteItem")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteItem(String JsonObject){
+        JSONObject json = null;
+
+        int res = 1;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+            int itemId = Integer.parseInt(json.get("ItemId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0) {
+                if (itemManager.deleteItem(itemId, customerId)) {
+                    res = 0;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj = new JSONObject();
+        obj.put("Response",res);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/deleteItemPhoto")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deleteItemPhoto(String JsonObject){
+        JSONObject json = null;
+
+        Response.ResponseBuilder responseBuilder = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("LoginDetails").toString();
+            int itemPhotoId = Integer.parseInt(json.get("ItemPhotoId").toString());
+
+            int customerId = customerManager.validateLogin(loginDetails);
+
+            if (customerId != 0 &&
+                    itemManager.deleteItemPhoto(itemPhotoId)){
+                responseBuilder = Response.status(Response.Status.OK);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return responseBuilder.build();
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/showItemPhotos")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<ItemPhotoEntity> getItemPhotos(String JsonObject){
+        JSONObject json = null;
+        List<ItemPhotoEntity> lstItems = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            int ItemId = Integer.parseInt(json.get("ItemId").toString());
+
+            lstItems = itemManager.getPhotosOfItem(ItemId);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+        return lstItems;
+    }
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/showItemDetails")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ItemDetailsSuperBean showItemDetails(String JsonObject){
+        JSONObject json = null;
+        ItemDetailsSuperBean itemResult = null;
+
+        try {
+            int customerId = 0;
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            if (!loginDetails.isEmpty()) {
+                customerId = customerManager.validateLogin(loginDetails);
+            }
+
+            int itemId = Integer.parseInt(json.get("ItemId").toString());
+            int month = 1;//Integer.parseInt(json.get("Month").toString());
+            int year = 1945;//Integer.parseInt(json.get("Year").toString());
+
+
+            DateFormat dateFormatter = new SimpleDateFormat("dd/MM/yyyy");
+
+            Calendar cl = new GregorianCalendar(year, month, 0);
+
+            Date dateStart = dateFormatter.parse("01/" + month + "/" + year);
+            Date dateEnd = cl.getTime();
+            
+            List<FeedbackItemBean> lstFeedback = null;
+            List<RentScheduleBean> lstRents = null;
+            
+            try {
+                int feedbackPageNum = Integer.parseInt(json.get("SectionNum").toString()); 
+                int feedbackResultsAmount = Integer.parseInt(json.get("SectionSize").toString());
+
+                lstFeedback = rentManager.getItemFeedback(itemId, feedbackPageNum, feedbackResultsAmount);
+                lstRents = rentManager.getItemRentsSchedule(itemId, dateStart, dateEnd, dateFormatter);
+			} catch (Exception e) {}
+
+            itemResult = itemManager.populateFullItemDetails(itemId, customerId, lstFeedback, lstRents);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return itemResult;
+    }
+}

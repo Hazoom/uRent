@@ -1,0 +1,44 @@
+<form name="ContactUsForm" id="ContactUsForm" novalidate role="form" valid-submit="send()">
+	<div class="modal-header">
+		<h3 class="modal-title">Contact Us</h3>
+	</div>
+	<div class="modal-body">
+		<div class="row">
+	        <label class="col-sm-2 control-label" for="email">Email</label>
+	        <div class="col-sm-8" ng-class="{
+             						'has-error': ContactUsForm.email.$invalid,
+               						'has-success': ContactUsForm.email.$valid}">
+	            <input id="email" name="email" class="form-control" type="email" ng-model="contact.email" placeholder="Your valid email.." required autofocus/>
+	            <div class="alert alert-danger" ng-show="ContactUsForm.$submitted && ContactUsForm.email.$error.required">Email is required</div>
+	        </div>
+		</div>
+		<br/>
+		<div class="row">
+	        <label class="col-sm-2 control-label" for="firstName">First name</label>
+	        <div class="col-sm-8" ng-class="{'has-success': ContactUsForm.$submitted}">
+	            <input id="firstName" name="firstName" class="form-control" type="text" ng-model="contact.firstName" placeholder="Please enter your first name.." autofocus/>
+	        </div>
+		</div>
+		<br/>
+		<div class="row">
+	        <label class="col-sm-2 control-label" for="lastName">Last name</label>
+	        <div class="col-sm-8" ng-class="{'has-success': ContactUsForm.$submitted}">
+	            <input id="lastName" name="lastName" class="form-control" type="text" ng-model="contact.lastName" placeholder="Please enter your last name.." autofocus/>
+	        </div>
+		</div>
+		<br/>
+		<div class="row">
+	        <label class="col-sm-2 control-label" for="comment">Comment</label>
+	        <div class="col-sm-8" ng-class="{
+             						'has-error': ContactUsForm.comment.$invalid,
+               						'has-success': ContactUsForm.comment.$valid}">
+	            <textarea id="comment" name="comment" class="form-control non-resizable" rows="5" ng-model="contact.comment" placeholder="Place for your comment.." required autofocus></textarea>
+	            <div class="alert alert-danger" ng-show="ContactUsForm.$submitted && ContactUsForm.comment.$error.required">Enter what you want to say</div>
+	        </div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn-primary btn-sm" ng-disabled="ContactUsForm.$invalid" type="submit">Contact</button>
+		<button class="btn-danger btn-sm" ng-click="close()">Close</button>
+	</div>
+</form>

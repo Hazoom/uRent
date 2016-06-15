@@ -1,0 +1,197 @@
+package entities;
+
+import org.hibernate.annotations.*;
+import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Date;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: Ran
+ * Date: 31/10/14
+ * Time: 01:38
+ * To change this template use File | Settings | File Templates.
+ */
+@Table(name = "UserMessage", schema = "app")
+@Entity
+@NamedQueries({
+        @NamedQuery(name= "UserMessage.DateSentAsc",
+                query="SELECT um FROM UserMessageEntity AS um " +
+                        "ORDER BY um.dateSent ASC",
+                hints={@QueryHint(name="org.hibernate.cacheable", value="true")})
+
+})
+@FilterDefs({
+        @FilterDef(name="rent", parameters={
+                @ParamDef( name="rentId", type="java.lang.Integer" )
+        })
+})
+@Filters({
+        @Filter(name="rent", condition="RentId = :rentId")
+})
+//@Cacheable
+//@Cache(usage=CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region="userMessage")
+public class UserMessageEntity implements Serializable {
+	
+	private static final long serialVersionUID = 8683903146326421625L;
+	
+	private int id;
+
+    @Column(name = "Id", nullable = false, length = 10)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private CustomerEntity thisSender;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "SenderId", nullable = false)
+    public CustomerEntity getThisSender() {
+        return thisSender;
+    }
+
+    public void setThisSender(CustomerEntity thisSender) {
+        this.thisSender = thisSender;
+    }
+
+    private CustomerEntity thisReceiver;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ReceiverId", nullable = false)
+    public CustomerEntity getThisReceiver() {
+        return thisReceiver;
+    }
+
+    public void setThisReceiver(CustomerEntity thisReceiver) {
+        this.thisReceiver = thisReceiver;
+    }
+
+    private Timestamp dateSent;
+
+    @Column(name = "DateSent", nullable = false, length = 23, precision = 3)
+    @Basic
+    public Timestamp getDateSent() {
+        return dateSent;
+    }
+
+    public void setDateSent(Timestamp dateSent) {
+        this.dateSent = dateSent;
+    }
+
+    private String content;
+
+    @Column(name = "Content", nullable = false, length = 2147483647)
+    @Basic
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    private RentEntity thisRent;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "RentId", nullable = false, insertable = true, updatable = true)
+    public RentEntity getThisRent() {
+        return thisRent;
+    }
+
+    public void setThisRent(RentEntity thisRent) {
+        this.thisRent = thisRent;
+    }
+
+    public UserMessageEntity() {
+    }
+
+    public UserMessageEntity(CustomerEntity thisSender,
+                             CustomerEntity thisReceiver,
+                             RentEntity thisRent,
+                             String content) {
+        this.thisSender = thisSender;
+        this.thisReceiver = thisReceiver;
+        this.thisRent = thisRent;
+        this.content = content;
+    }
+
+    @PrePersist
+    public void setConstants(){
+        this.dateSent = new Timestamp(new Date().getTime());
+    }
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((content == null) ? 0 : content.hashCode());
+		result = prime * result
+				+ ((dateSent == null) ? 0 : dateSent.hashCode());
+		result = prime * result + id;
+		result = prime * result
+				+ ((thisReceiver == null) ? 0 : thisReceiver.hashCode());
+		result = prime * result
+				+ ((thisRent == null) ? 0 : thisRent.hashCode());
+		result = prime * result
+				+ ((thisSender == null) ? 0 : thisSender.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserMessageEntity other = (UserMessageEntity) obj;
+		if (content == null) {
+			if (other.content != null)
+				return false;
+		} else if (!content.equals(other.content))
+			return false;
+		if (dateSent == null) {
+			if (other.dateSent != null)
+				return false;
+		} else if (!dateSent.equals(other.dateSent))
+			return false;
+		if (id != other.id)
+			return false;
+		if (thisReceiver == null) {
+			if (other.thisReceiver != null)
+				return false;
+		} else if (!thisReceiver.equals(other.thisReceiver))
+			return false;
+		if (thisRent == null) {
+			if (other.thisRent != null)
+				return false;
+		} else if (!thisRent.equals(other.thisRent))
+			return false;
+		if (thisSender == null) {
+			if (other.thisSender != null)
+				return false;
+		} else if (!thisSender.equals(other.thisSender))
+			return false;
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "UserMessageEntity [id=" + id + ", thisSender=" + thisSender
+				+ ", thisReceiver=" + thisReceiver + ", dateSent=" + dateSent
+				+ ", content=" + content + ", thisRent=" + thisRent + "]";
+	}
+}

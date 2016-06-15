@@ -1,0 +1,142 @@
+package exportBeans.Abstract;
+
+import entities.CustomerEntity;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 01/11/14
+ * Time: 02:27
+ * To change this template use File | Settings | File Templates.
+ */
+public abstract class CustomerProfileSuperBean {
+
+    protected int id;
+    protected String email;
+
+    protected long dateJoined;
+    protected long dateLastLogin;
+
+    protected String firstName;
+    protected String lastName;
+
+    protected double latitude;
+    protected double longitude;
+
+    protected float rateAsSupplier;
+    protected int rateAsSupplierCount;
+
+    protected float rateAsBuyer;
+    protected int rateAsBuyerCount;
+
+    public CustomerProfileSuperBean(CustomerEntity Customer){
+        this.id = Customer.getId();
+
+        this.dateJoined = Customer.getDateJoined().getTime();
+
+        this.firstName = Customer.getFirstname();
+        this.lastName = Customer.getLastname();
+
+        this.rateAsSupplier = Customer.getRateassupplier();
+        this.rateAsSupplierCount = Customer.getRateassuppliercount();
+        
+        this.rateAsBuyer = Customer.getRateasbuyer();
+        this.rateAsBuyerCount = Customer.getRateasbuyercount();
+    }
+
+	public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public long getDateJoined() {
+        return dateJoined;
+    }
+
+    public void setDateJoined(long dateJoined) {
+        this.dateJoined = dateJoined;
+    }
+
+    public long getDateLastLogin() {
+        return dateLastLogin;
+    }
+
+    public void setDateLastLogin(long dateLastLogin) {
+        this.dateLastLogin = dateLastLogin;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public float getRateAsSupplier() {
+        return rateAsSupplier;
+    }
+
+    public void setRateAsSupplier(float rateAsSupplier) {
+        this.rateAsSupplier = rateAsSupplier;
+    }
+
+    public int getRateAsSupplierCount() {
+        return rateAsSupplierCount;
+    }
+
+    public void setRateAsSupplierCount(int rateAsSupplierCount) {
+        this.rateAsSupplierCount = rateAsSupplierCount;
+    }
+
+    public float getRateAsBuyer() {
+        return rateAsBuyer;
+    }
+
+    public void setRateAsBuyer(float rateAsBuyer) {
+        this.rateAsBuyer = rateAsBuyer;
+    }
+
+    public int getRateAsBuyerCount() {
+        return rateAsBuyerCount;
+    }
+
+    public void setRateAsBuyerCount(int rateAsBuyerCount) {
+        this.rateAsBuyerCount = rateAsBuyerCount;
+    }
+}

@@ -1,0 +1,12 @@
+<div ng-if="getTab() == 1">
+    <userdetails-directive></userdetails-directive>
+</div>
+<div ng-if="getTab() == 2" ng-controller="RentsController" ng-init="getAllBuyerFeedback()">
+    <showfeedback-directive></showfeedback-directive>
+</div>
+<div ng-if="getTab() == 3" ng-controller="RentsController" ng-init="getAllSupplierFeedback()">
+    <showfeedback-directive></showfeedback-directive>
+</div>
+<div ng-if="getTab() == 4" ng-controller="ShowItemsController" ng-init="initCurrentPage(); loadItemsOfUser()">
+    <showitems-directive></showitems-directive>
+</div>

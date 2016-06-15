@@ -1,0 +1,110 @@
+<div data-ng-controller="MainController" data-ng-init="init()" id="headerDiv">
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-4 column"> <a href="#" ng-click="setHomePage(true)"><img src="img/uglogo.png" class="img-responsive" id="logo" alt=""></a> </div>
+            <div class="col-md-8 column">
+                <div class="account">
+                    <div ng-if="!myLoginService.authenticated">
+                        <button ng-controller="LoginModalController as loginModalCtrl" ng-click="open()" type="button" class="btn-primary topbasketbutton">Sign in</button>
+                        <a ng-click="setHomePage(false)" href="#/AddMember" type="button" class="btn-primary topbasketbutton">Register</a>
+                    </div>
+                    <div ng-if="myLoginService.authenticated">
+                        <a href="#/MyArea?tab=1"><button ng-click="setHomePage(false)" type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon-user"></span> My Area</button></a>
+                        <!--<a href="#/Messages"><button ng-click="setHomePage(false)"type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon-envelope"><span id="newUserMessagesCount" class="messages-count">0</span></span> Messages</button></a> -->
+                        <a href="#/MyRents?p=1&filter=by"><button ng-click="setHomePage(false)" type="button" class="btn-primary topbasketbutton"><span class="glyphicon glyphicon-credit-card"><span ng-bind="myLoginService.newRentsCount" class="rents-count"></span></span> Rents</button></a>
+                    </div>
+                </div>
+                <div class="basket" ng-if="myLoginService.authenticated">Hello <b>{{myLoginService.firstName}} {{myLoginService.lastName}} </b> (<a ng-controller="LoginController as loginCtrl" href ng-click="logOut()">Logout</a>)</div>
+                <div class="basket" ng-if="!myLoginService.authenticated"><b><a ng-href="#/ForgotPassword">Forgot password? </a></b></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container margintop20 nav-bg-color round">
+    	<div class="col-md-12 column up-down-5-padding">
+			<div class="dropdown col-md-2">
+				<button type="button" data-toggle="dropdown" class="btn btn-primary round">
+					Navigate To Category <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+					<li ng-repeat="category in categoriesLst" class="dropdown-submenu">
+			          	<a ng-href="#/categories/{{category.name}}?p=1">{{category.name}}</a>
+			          	<ul class="dropdown-menu">
+			          		<li ng-repeat="subCategory in category.subCategories">
+			          			<a ng-href="#/categories/{{category.name}}/{{subCategory.name}}?p=1">{{subCategory.name}}</a>
+			          		</li>
+			          	</ul>
+		          	</li>
+		        </ul>
+		    </div>
+
+		    <div class="col-md-10" ng-controller="SearchController" ng-init="init()">
+				<div class="fill-width row">
+					<div class="col-md-8 no-padding">
+            			<input class="search-section-fit" type="text" ng-model="searchQuery" placeholder="Search for..." name="q">
+					</div>
+					<div class="col-md-2 no-padding">
+	                	<select class="search-section-fit" ng-model="advancedsearch.selectedCategory">
+	                    	<option ng-selected="{{category.id == 0}}" ng-repeat="category in categoriesLst" value="{{category.id}}">{{category.name}}</option>
+	                	</select>
+					</div>
+					<div class="col-md-2 no-padding">
+            			<button ng-click="setHomePage(false); makeStringSearch()" class="btn btn-default search-button" type="submit">
+            				<i class="glyphicon glyphicon-search"></i>
+            			</button>
+            			<a href="#/advanced?tab=1">Advanced</a>
+					</div>
+				</div>
+		    </div>
+    </div>
+</div>
+</div>
+
+<div ng-controller="LoginModalController">
+    <script type="text/ng-template" id="loginModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Login</h3>
+        </div>
+        <div class="modal-body">
+            <form name="loginForm" id="loginForm" novalidate role="form">
+                <div class="row">
+                    <div class="form-group" clearfix ng-class="{
+                        'has-error': loginForm.$submitted && loginForm.email.$invalid,
+                        'has-success': loginForm.$submitted && loginForm.email.$valid}">
+                        <label class="col-sm-2 control-label" for="email">Email</label>
+                        <div class="col-sm-8">
+                            <input id="email" name="email" ng-model="email" type="email" class="form-control" placeholder="Enter email" title="Email" required autofocus/>
+                            <div class="alert alert-danger" ng-show="loginForm.$submitted && loginForm.email.$error.required">Email is required</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group" clearfix ng-class="{
+                        'has-error': loginForm.$submitted && loginForm.password.$invalid,
+                        'has-success': loginForm.$submitted && loginForm.password.$valid}">
+                        <label class="col-sm-2 control-label" for="password">Password</label>
+                        <div class="col-sm-5">
+                            <input id="password" name="password" ng-model="pwd" type="password" class="form-control" placeholder="Enter password" title="Password" required autofocus/>
+                            <div class="alert alert-danger" ng-show="loginForm.$submitted && loginForm.password.$error.required">Password is required</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group" clearfix>
+                        <div class="checkbox col-sm-6">
+                            <label>
+                                <input id="rememberMe" name="rememberMe" ng-model="rememberMe" type="checkbox" value="remember-me"> Remember me
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="alert alert-danger" ng-show="myLoginService.userSuspended">User is suspended!</div>
+        <div class="alert alert-danger" ng-show="myLoginService.loginFailed">One or more of the details are wrong</div>
+        <div class="modal-footer">
+            <button class="btn-primary btn-sm" ng-disabled="(loginForm.$submitted && loginForm.$invalid)" ng-click="ok(); loginForm.$submitted = true;">OK</button>
+            <button class="btn-danger btn-sm" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+</div>

@@ -1,0 +1,155 @@
+<div ng-if="hasError()" style="text-align: center;">
+    <div class="row">
+        <label><b>Critical Error occurred. Please try again</b></label>
+    </div>
+</div>
+<div ng-if="!hasError()" scroll-glue-top="glued">
+    <ol class="breadcrumb round" ng-if="myItemsList">
+        <li><a href="#"><i class="fa fa-home"></i></a></li>
+        <li><a>My Area</a></li>
+        <li><a>My Items</a></li>
+    </ol>
+    <div class="well well-sm">
+        <div class="pull-right">
+            <form class="form" role="form">
+                <div class="form-group">
+                    <select class="form-control" ng-options="sort as sort.display for sort in sorts" ng-change="sortChanged()" ng-model="$parent.selectedOrder"></select>
+                </div>
+            </form>
+
+        </div>
+        <div class="btn-group" ng-if="myItemsList">
+            <div class="text-left" ><a ng-href="#/MyArea?action=add" class="btn btn-default btn-sm" role="button" ><span class="glyphicon glyphicon-plus"></span> Add new item</a></div>
+        </div>
+        <div class="btn-group" ng-if="!myItemsList">
+            <div class="text-left" ><a ng-href="/" class="btn btn-default btn-sm" role="button" ><span class="glyphicon glyphicon-home"></span> Home</a></div>
+        </div>
+    </div>
+
+    <div ng-repeat="rows in chunkedItems">
+        <div ng-repeat="item in rows">
+            <div class="col-md-12 column productbox">
+                <div class="col-md-2">
+                    <div ng-if="myItemsList">
+	                	<a ng-href="#/MyArea?action=show&itemId={{item.id}}">
+	                    	<img ng-if="item.mainPhoto" ng-src="data:image/jpeg;base64,{{item.mainPhoto}}" class="img-responsive" alt="Product Image">
+	                   	</a>
+	                   	<a ng-href="#/MyArea?action=show&itemId={{item.id}}">
+	                    	<img ng-if="!item.mainPhoto" src="img/no_image_available.jpg" class="img-responsive" alt="Product Image">
+	                   	</a>
+                    </div>
+                    <div ng-if="!myItemsList">
+	                	<a ng-href="#/ItemDetails/{{item.id}}">
+	                    	<img ng-if="item.mainPhoto" ng-src="data:image/jpeg;base64,{{item.mainPhoto}}" class="img-responsive" alt="Product Image">
+	                   	</a>
+	                   	<a ng-href="#/ItemDetails/{{item.id}}">
+	                    	<img ng-if="!item.mainPhoto" src="img/no_image_available.jpg" class="img-responsive" alt="Product Image">
+	                   	</a>
+                    </div>
+                </div>
+                <div class="col-md-10">
+                    <div class="producttitle">{{item.name}}</div><p>{{item.description}}</p>
+                    <div class="action">
+                        <div ng-if="item.rate == 0">
+                            <b>Rating:</b> <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 0 && item.rate <= 0.5">
+                            <b>Rating:</b> <i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 0.5 && item.rate <= 1">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 1 && item.rate <= 1.5">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 1.5 && item.rate <= 2">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 2 && item.rate <= 2.5">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 2.5 && item.rate <= 3">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 3 && item.rate <= 3.5">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 3.5 && item.rate <= 4">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-o"></i>
+                        </div>
+                        <div ng-if="item.rate > 4 && item.rate <= 4.5">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star-half-full gold"></i>
+                        </div>
+                        <div ng-if="item.rate > 4.5">
+                            <b>Rating:</b> <i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i><i class="fa fa-star gold"></i>
+                        </div>
+                    </div>
+                    <div class="productprice">
+                        <div class="row">
+                            <div class="col-md-6 col-xs-12 pull-left">
+                                <div class="col-md-3">
+                                    <div class="pricetext text-left" ng-if="!item.dailyPrice">Daily: N/A</div>
+                                    <div class="pricetext text-left" ng-if="item.dailyPrice">Daily: ${{item.dailyPrice}}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="pricetext" ng-if="!item.weeklyPrice">Weekly: N/A</div>
+                                    <div class="pricetext" ng-if="item.weeklyPrice">Weekly: ${{item.weeklyPrice}}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="pricetext" ng-if="!item.monthlyPrice">Monthly: N/A</div>
+                                    <div class="pricetext" ng-if="item.monthlyPrice">Monthly: ${{item.monthlyPrice}}</div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="pricetext" ng-if="!item.value">Value: N/A</div>
+                                    <div class="pricetext" ng-if="item.value">Value: ${{item.value}}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xs-12" ng-if="myItemsList">
+                                <div class="row">
+                                    <div class="pull-right col-md-5" >
+                                  		<button popover-template="deleteConfirmationPopover.templateUrl" popover-title="{{deleteConfirmationPopover.title}}" popover-trigger="focus" class="btn-danger btn-sm pull-right">
+                                    		<span class="glyphicon glyphicon-remove"></span> 
+                                    		Remove
+                                    	</button>
+                                    </div>
+		                            <div class="pull-left right-left-5-padding" >
+		                            	<a ng-href="#/MyArea?action=show&itemId={{item.id}}">
+							           		<button class="btn-primary btn-sm" role="button">
+								           		<span class="glyphicon glyphicon-shopping-cart"></span> 
+								           			Details
+							         		</button>
+						         		</a>
+							       	</div>
+                                    <div class="pull-left right-left-5-padding" >
+                                    	<a ng-href="#/MyArea?action=edit">
+	                                    	<button ng-click="saveItemToEdit(item.id)" class="btn-warning btn-sm" role="button">
+	                                    		<span class="glyphicon glyphicon-pencil"></span> 
+	                                    		Edit
+	                                   		</button>
+                                   		</a>
+                                	</div>
+                                </div>
+                            </div>
+	                        <div class="col-md-6" ng-if="!myItemsList">
+	                            <div class="pull-right" >
+					           		<a ng-href="#/ItemDetails/{{item.id}}" class="btn-primary btn-sm" role="button">
+						           		<span class="glyphicon glyphicon-shopping-cart"></span> 
+						           			Details
+					         		</a>
+						       	</div>
+	                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-12 column text-center">
+    	<pagination total-items="totalItemsMyItems()" ng-model="$parent.currentPage" ng-change="pageChangedMyItems()" max-size="maxSize"></pagination>
+    </div>
+</div>
+
+<script type="text/ng-template" id="deleteConfirmationPopover.html">
+	<a class="btn btn-danger btn-md round" ng-click="removeItem(item.id)" role="button"><span class="glyphicon glyphicon-remove-sign"></span>Remove!</a>
+</script> 

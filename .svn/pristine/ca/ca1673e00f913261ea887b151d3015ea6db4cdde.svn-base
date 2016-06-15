@@ -1,0 +1,91 @@
+<div ng-controller="AddMemberController" class="container" style="text-align: left;">
+    <div class="row">
+    	<div ng-if="member.serverError" class="form-group clearfix" style="text-align: center;"">
+ 			<div class="alert alert-danger">Critical Error occurred. Please try again</div>
+		</div>
+		<div ng-if="member.success" class="form-group clearfix" style="text-align: center;"">
+ 			<div class="alert alert-success">Registration completed successfully!</div>
+		</div>
+    	<div class="well well-sm">   	
+	        <form ng-if="!member.afterAddMember" name="addMemberForm" id="addMemberForm" valid-submit="sendForm()" novalidate role="form">
+   				<div class="form-group clearfix" ng-class="{
+                    'has-error': addMemberForm.$submitted && addMemberForm.Email.$invalid,
+                    'has-success': addMemberForm.$submitted && addMemberForm.Email.$valid}">
+		            <div class="row">
+	                    <label class="col-sm-offset-2 col-sm-2 control-label" for="Email">Email</label>
+	                    <div class="col-sm-5">
+	                        <input id="Email" name="Email" class="form-control" type="email" ng-model="member.Email" required autofocus/>
+	                        <div class="alert alert-danger" ng-show="addMemberForm.$submitted && addMemberForm.Email.$error.required">Email is required</div>
+	                        <div class="alert alert-danger" ng-show="member.userExists">User already exists</div>
+	                    </div>
+	                </div>
+	            </div>
+	                <div class="form-group clearfix" ng-class="{
+	                            'has-error': addMemberForm.$submitted && addMemberForm.firstName.$invalid,
+	                            'has-success': addMemberForm.$submitted && addMemberForm.firstName.$valid}">
+                        <div class="row">
+		                    <label class="col-sm-offset-2 col-sm-2 control-label" for="firstName">First Name</label>
+		                    <div class="col-sm-3">
+		                        <input id="firstName" name="firstName" class="form-control" type="text" ng-model="member.firstName" required autofocus/>
+		                        <div class="alert alert-danger" ng-show="addMemberForm.$submitted && addMemberForm.firstName.$error.required">First name is required</div>
+		                    </div>
+	                	</div>
+	            	</div>
+                <div class="form-group clearfix" ng-class="{
+                            'has-error': addMemberForm.$submitted && addMemberForm.lastName.$invalid,
+                            'has-success': addMemberForm.$submitted && addMemberForm.lastName.$valid}">
+                    <div class="row">
+	                    <label class="col-sm-offset-2 col-sm-2 control-label" for="lastName">Last Name</label>
+	                    <div class="col-sm-3">
+	                        <input id="lastName" name="lastName" class="form-control" type="text" ng-model="member.lastName" required autofocus/>
+	                        <div class="alert alert-danger" ng-show="addMemberForm.$submitted && addMemberForm.lastName.$error.required">Last name is required</div>
+	                    </div>
+                	</div>
+	            </div>
+                <div class="form-group clearfix" ng-class="{
+               				'has-error': addMemberForm.$submitted && addMemberForm.password.$invalid,
+               				'has-success': addMemberForm.$submitted && addMemberForm.password.$valid}">
+	            	<div class="row">
+	                    <label class="col-sm-offset-2 col-sm-2 control-label" for="password">Password</label>
+	                    <div class="col-sm-3">
+	                        <input id="password" name="password" ng-model="member.pwd" type="password" class="form-control" title="Password" required autofocus/>
+	                        <div class="alert alert-danger" ng-show="addMemberForm.$submitted && addMemberForm.password.$error.required">Password is required</div>
+	                    </div>
+	                </div>
+	            </div>
+                <div class="form-group clearfix" ng-class="{
+               				'has-error': addMemberForm.$submitted && addMemberForm.passwordAgain.$invalid,
+               				'has-success': addMemberForm.$submitted && addMemberForm.passwordAgain.$valid}">
+	            	<div class="row">
+	                    <label class="col-sm-offset-2 col-sm-2 control-label" for="passwordAgain">Confirm Password</label>
+	                    <div class="col-sm-3">
+	                        <input id="passwordAgain" name="passwordAgain" ng-model="member.pwdAgain" type="password" class="form-control" title="Password" required autofocus/>
+	                        <div class="alert alert-danger" ng-show="addMemberForm.$submitted && addMemberForm.passwordAgain.$error.required">Repeated password is required</div>
+	                        <div class="alert alert-danger" ng-show="member.notSamePasswords">The two passwords are not the same</div>
+	                    </div>
+	                </div>
+	            </div> 
+	            <div class="form-group">
+	            	<div class="row">
+	                    <label class="col-sm-offset-2 col-lg-2 control-label" for="googleMap">Place</label>
+       	                <div class="col-lg-8">
+	                    	<div class="col-md-10">
+	                        	<div data-ng-controller="AddMemberController" data-ng-init="init()" id="googleMap" class="googlemap-box"></div>
+	                        	<input id="searchBox" class="controls googlemap-search" type="text" placeholder="Search Box">
+                        	</div>
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="row" style="text-align: center;">
+	                <div class="col-sm-offset-2 col-sm-2"></div>
+	                <div class="col-sm-5">
+	                    <div class="alert alert-danger" ng-show="member.notPlace">Place is required</div>
+	                </div>
+	            </div>
+	            <div class="row" style="text-align: center;">
+	                <button type="submit" class="btn-primary btn-sm" ng-disabled="(addMemberForm.$submitted && addMemberForm.$invalid)">Submit</button>
+	            </div>
+	        </form>
+        </div>
+    </div>
+</div>

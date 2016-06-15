@@ -1,0 +1,27 @@
+<div ng-if="getTab() == 1">
+    <myaccount-directive></myaccount-directive>
+</div>
+<div ng-if="getTab() == 2">
+    <editaccount-directive></editaccount-directive>
+</div>
+<div ng-if="getTab() == 3">
+    <changepassword-directive></changepassword-directive>
+</div>
+<div ng-if="getTab() == 4" ng-controller="RentsController" ng-init="getAllBuyerFeedback()">
+    <showfeedback-directive></showfeedback-directive>
+</div>
+<div ng-if="getTab() == 5" ng-controller="RentsController" ng-init="getAllSupplierFeedback()">
+    <showfeedback-directive></showfeedback-directive>
+</div>
+<div ng-if="getTab() == 6" ng-controller="ShowItemsController" ng-init="initCurrentPage(); loadItemsOfUser()">
+    <showitems-directive></showitems-directive>
+</div>
+<div ng-if="isTabUndefined() && addItem" ng-controller="AddItemController">
+    <addItem-directive></addItem-directive>
+</div>
+<div ng-if="isTabUndefined() && editItem" ng-controller="AddItemController" data-ng-init="loadItem()">
+    <edititem-directive></edititem-directive>
+</div>
+<div ng-if="isTabUndefined() && showItem" ng-controller="ShowItemController" data-ng-init="getItem()" ng-show="isItemOwner()">
+	<showitem-directive></showitem-directive>
+</div>

@@ -1,0 +1,445 @@
+package bl;
+
+import dao.CustomerDAO;
+import dao.ItemDAO;
+import dao.MessageDAO;
+import dao.RentDAO;
+import exportBeans.Abstract.CustomerProfileSuperBean;
+import application.ApplicationConstants;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.*;
+
+import javax.mail.*;
+import javax.mail.internet.*;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: OWNER
+ * Date: 30/11/14
+ * Time: 13:36
+ * To change this template use File | Settings | File Templates.
+ */
+@Path("/CustomerService")
+@Stateless
+public class CustomerBL {
+
+    @EJB
+    private CustomerDAO customerManager;
+
+    @EJB
+    private ItemDAO itemManager;
+
+    public CustomerBL(){
+    }
+
+    @Path("/ValidateLoginByEmail")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String validateLoginByEmail(String jsonObject) {
+        JSONObject json = null;
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String Email=(String) json.get("Email");
+            String Password=(String) json.get("Password");
+            return this.customerManager.validateLogin(Email, Password);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Path("/ValidateLogin")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String validateLogin(String jsonObject) {
+        JSONObject json = null;
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            return this.customerManager.validateLoginWithDetails(loginDetails);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @EJB
+    private RentDAO rentManager;
+
+    @EJB
+    private MessageDAO messageManager;
+
+    @Path("/getUserDetails")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getUserDetails(String jsonObject) {
+        JSONObject json = null;
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String loginDetails = json.get("CCC").toString();
+
+            return this.customerManager.getUserDetails(loginDetails);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Path("/AddCustomer")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String addCustomer(String jsonObject) {
+
+        JSONObject json = null;
+        int res = ApplicationConstants.ADD_CUSTOMER_FAILED;
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String Email = (String) json.get("Email");
+            String FirstName = (String) json.get("FirstName");
+            String LastName = (String) json.get("LastName");
+            String Password = (String) json.get("Password");
+            Double Latitude = (Double) json.get("Latitude");
+            Double Longitude = (Double) json.get("Longitude");
+            res = this.customerManager.addCustomer(Email, FirstName, LastName, Latitude, Longitude, Password);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",res);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    @Path("/UpdateCustomer")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateCustomer(String jsonObject) {
+
+        JSONObject json = null;
+        boolean res = false;
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String Email = (String) json.get("Email");
+            String ID = (String) json.get("ID");
+            String FirstName = (String) json.get("FirstName");
+            String LastName = (String) json.get("LastName");
+            Double Latitude = 0.0;
+            try {
+                Latitude = (Double) json.get("Latitude");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            Double Longitude = 0.0;
+            try {
+                Longitude = (Double) json.get("Longitude");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            res = this.customerManager.updateCustomer(Integer.valueOf(ID), Email, FirstName, LastName, Latitude, Longitude);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",res);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    @Path("/DeleteCustomer")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public boolean deleteCustomer(@FormParam("CustomerID") int CustomerId) {
+        return this.customerManager.deleteCustomer(CustomerId);
+    }
+
+    @Path("/ChangePassword")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String changePassword(String jsonObject) {
+
+        JSONObject json = null;
+        String newCCC = "";
+        
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String newPassword = json.get("NewPassword").toString();
+            
+            String loginDetails = null;
+            String email = null;
+            try{
+                loginDetails = json.get("CCC").toString();
+                int customerId = customerManager.validateLogin(loginDetails);
+            	if (customerId > 0){
+                	newCCC = customerManager.changePassword(customerId, newPassword);
+            	}
+            } catch(Exception e){
+            	email = json.get("Email").toString();
+
+            	newCCC = customerManager.changePassword(email, newPassword);
+            }
+            	
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("NewCCC",newCCC);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    @Path("/ForgotPasswordMail")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String forgotPasswordMail(String jsonObject) {
+
+    	JSONObject json = null;
+    	int response = 1;
+  		try {
+	    	json = (JSONObject) new JSONParser().parse(jsonObject);
+	    	String email = json.get("Email").toString();
+
+		    String from = ApplicationConstants.MAIL_USER;  // GMail user name (just the part before "@gmail.com")
+		    String pass = ApplicationConstants.MAIL_PASSWORD; // GMail password
+		    String[] to = { email }; 
+		    
+		    String subject = "Password recovery";
+		    
+		    String initPasswordString = customerManager.createInitPasswordString(email);
+		    if (initPasswordString != null &&
+    					this.sendEmail(email, subject, ApplicationConstants.MAIL_CONTENT_FORGOT_PASSWORD + 
+    							ApplicationConstants.MAIL_CONTENT_FORGOT_PASSWORD_LINK + initPasswordString)){
+		        response = 0;
+		    }
+	    } catch (ParseException pe) {
+	        pe.printStackTrace();
+	    } catch (Exception e){
+	    	e.printStackTrace();
+	    }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+
+    @Path("/VerifyStr")
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    public String VerifyString(String jsonObject) {
+
+        JSONObject json = null;
+        String email = null;
+        
+        try {
+            json = (JSONObject) new JSONParser().parse(jsonObject);
+            String str = json.get("Str").toString();
+            
+            if (!str.isEmpty()){
+            	email = customerManager.verifyInitPasswordString(str);
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Email",email);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+    
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/showCustomerDetails")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CustomerProfileSuperBean showCustomerDetails(String JsonObject){
+		JSONObject json = null;
+        CustomerProfileSuperBean customerResult = null;
+
+        try {
+            json = (JSONObject) new JSONParser().parse(JsonObject);
+            
+            int customerId = ApplicationConstants.DEFAULT_CUSTOMER_ID;
+            try {
+                String loginDetails = json.get("CCC").toString();
+                customerId = customerManager.validateLogin(loginDetails);
+            } catch (Exception e){}
+            
+            int wantedCustomerId = Integer.parseInt(json.get("WantedCustomerId").toString());
+
+            customerResult = customerManager.populateCustomerDetails(wantedCustomerId, customerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return customerResult;
+    }
+    
+
+    /**
+     *
+     * @param JsonObject
+     * @return
+     */
+    @POST
+    @Path("/contactUs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String contactUs(String jsonObject){
+
+    	JSONObject json = null;
+    	int response = 1;
+  		try {
+	    	json = (JSONObject) new JSONParser().parse(jsonObject);
+	    	String email = json.get("Email").toString();
+	    	String firstName = json.get("FirstName").toString();
+	    	String lastName = json.get("LastName").toString();
+	    	String comment = json.get("Comment").toString();
+
+		    String subject = "Info message";
+
+		    if (comment != null &&
+		    		this.sendEmail(email, subject, ApplicationConstants.MAIL_CONTENT_NOTES)){
+		        
+		        response = customerManager.addContactUsInfo(email, firstName, lastName, comment);
+		    }
+	    } catch (ParseException pe) {
+	        pe.printStackTrace();
+	    } catch (Exception e){
+	    	e.printStackTrace();
+	    }
+
+        JSONObject obj=new JSONObject();
+        obj.put("Response",response);
+        StringWriter out = new StringWriter();
+        try {
+            obj.writeJSONString(out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String jsonText = out.toString();
+
+        return jsonText;
+    }
+    
+    /**
+     * 
+     * @param toEmail
+     * @param subject
+     * @param htmlContent
+     * @return
+     */
+    private boolean sendEmail(String toEmail, String subject, String htmlContent){
+    	boolean sent = false;
+    	
+    	try {
+		    String from = ApplicationConstants.MAIL_USER;  // GMail user name (just the part before "@gmail.com")
+		    String pass = ApplicationConstants.MAIL_PASSWORD; // GMail password
+		    String[] to = { toEmail };
+		    
+		    String host = "smtp.gmail.com";
+		    
+		    StringBuilder content = new StringBuilder(ApplicationConstants.MAIL_CONTENT_HEADER)
+		    		.append(htmlContent)
+		    		.append(ApplicationConstants.MAIL_CONTENT_FOOTER);
+		
+		    Properties props = System.getProperties();
+		    props.put("mail.smtp.starttls.enable", "true");
+		    props.put("mail.smtp.host", host);
+		    props.put("mail.smtp.user", from);
+		    props.put("mail.smtp.password", pass);
+		    props.put("mail.smtp.port", "587");
+		    props.put("mail.smtp.auth", "true");
+		
+		    Session session = Session.getDefaultInstance(props);
+		    MimeMessage message = new MimeMessage(session);
+		
+	        message.setFrom(new InternetAddress(from));
+	        InternetAddress[] toAddress = new InternetAddress[to.length];
+
+	        // To get the array of addresses
+	        for( int i = 0; i < to.length; i++ ) {
+	            toAddress[i] = new InternetAddress(to[i]);
+	        }
+
+	        for( int i = 0; i < toAddress.length; i++) {
+	            message.addRecipient(Message.RecipientType.TO, toAddress[i]);
+	        }
+	        
+	        message.setSubject(subject);
+	        message.setContent(content.toString(), "text/html; charset=utf-8");
+	        Transport transport = session.getTransport("smtp");
+	        transport.connect(host, from, pass);
+	        transport.sendMessage(message, message.getAllRecipients());
+	        transport.close();
+	        
+	        sent = true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	return sent;
+    }
+}

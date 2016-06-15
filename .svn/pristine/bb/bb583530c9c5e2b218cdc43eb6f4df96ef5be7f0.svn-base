@@ -1,0 +1,25 @@
+<a ng-show="currentRentStatus > -1 && (messagesState || cancelState)" href ng-click="getRent(currentRentId); changeState('details')" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<span class="glyphicon glyphicon-book"></span> 
+	Details mode
+</a>
+
+<a ng-show="currentRentStatus > -1 && (detailsState || cancelState)" href ng-click="getRentConversation(currentRentId, currentRentStatus); changeState('messages')" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<span class="glyphicon glyphicon-book"></span> 
+	Messages mode
+</a>
+
+<a ng-show="currentRentStatus > -1" href="#/Rent/{{currentRentId}}" class="btn-info btn-sm right-left-5-margin-only" type="button" >
+	<i class="fa fa-external-link"></i> 
+	Refer to
+</a>
+
+<a href ng-show="currentRentStatus == 0 && myRentsService.inSupplierRents && !cancelState" type="button" class="btn-success btn-sm right-left-5-margin-only" ng-click="approve(currentRentId)">
+	<span class="glyphicon glyphicon-ok"></span> 
+	Approve
+</a>
+
+<a href ng-show="(currentRentStatus == 0 || currentRentStatus == 1) && !cancelState" type="button" class="btn-danger btn-sm right-left-5-margin-only" ng-click="changeState('cancel')">
+	<span class="glyphicon glyphicon-remove"></span> 
+	Cancel
+</a>
+   	

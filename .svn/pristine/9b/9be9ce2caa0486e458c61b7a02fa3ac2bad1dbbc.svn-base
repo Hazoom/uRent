@@ -1,0 +1,14 @@
+.form-group.alert {
+    padding: 0px;
+    margin-bottom: 0px;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
+
+.contaier {
+    border-color:Black;
+    box-shadow:none;
+}

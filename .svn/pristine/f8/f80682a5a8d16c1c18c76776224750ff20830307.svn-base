@@ -1,0 +1,268 @@
+package exportBeans.Abstract;
+
+import entities.*;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: Ran
+ * Date: 16/01/15
+ * Time: 15:41
+ * To change this template use File | Settings | File Templates.
+ */
+public abstract class RentDetailsSuperBean {
+
+    protected int id;
+
+    protected long dateOpened;
+    protected long dateUpdated;
+
+    protected long startRent;
+    protected long endRent;
+
+    protected int otherId;
+    protected String otherName;
+    protected boolean isBuyer;
+
+    protected int statusId;
+    protected String statusDescription;
+
+    protected int itemId;
+    protected String itemName;
+
+    protected Float dailyPrice;
+    protected Float weeklyPrice;
+    protected Float monthlyPrice;
+    protected Float value;
+
+    protected String itemDescriptionPreRent;
+
+    protected Integer buyerRate;
+    protected String buyerFeedback;
+    protected Integer supplierRate;
+    protected String supplierFeedback;
+    protected Integer itemRate;
+    protected String itemFeedback;
+
+    protected String cancellationReason;
+
+    public RentDetailsSuperBean(RentEntity Rent) {
+        this.id = Rent.getId();
+
+        this.startRent = Rent.getRentfromdate().getTime();
+        this.endRent = Rent.getRenttodate().getTime();
+
+        ItemEntity item = Rent.getThisItem();
+        this.itemId = item.getId();
+        this.itemName = item.getItemName();
+
+        PriceEmbeddable price = item.getThisPrice();
+        if (price != null) {
+            this.dailyPrice = price.getDay();
+            this.weeklyPrice = price.getWeek();
+            this.monthlyPrice = price.getMonth();
+            this.value = price.getValue();
+        }
+
+        this.itemDescriptionPreRent = Rent.getItemDescriptionPreRent();
+
+        FeedbackEntity feedback = Rent.getThisFeedback();
+        this.buyerRate = feedback.getBuyerRate();
+        this.buyerFeedback = feedback.getBuyerFeedback();
+        this.supplierRate = feedback.getSupplierRate();
+        this.supplierFeedback = feedback.getSupplierFeedback();
+        this.itemRate = feedback.getItemRate();
+        this.itemFeedback = feedback.getItemFeedback();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public long getDateOpened() {
+        return dateOpened;
+    }
+
+    public void setDateOpened(long dateOpened) {
+        this.dateOpened = dateOpened;
+    }
+
+    public long getDateUpdated() {
+        return dateUpdated;
+    }
+
+    public void setDateUpdated(long dateUpdated) {
+        this.dateUpdated = dateUpdated;
+    }
+
+    public long getStartRent() {
+        return startRent;
+    }
+
+    public void setStartRent(long startRent) {
+        this.startRent = startRent;
+    }
+
+    public long getEndRent() {
+        return endRent;
+    }
+
+    public void setEndRent(long endRent) {
+        this.endRent = endRent;
+    }
+
+    public int getOtherId() {
+        return otherId;
+    }
+
+    public void setOtherId(int otherId) {
+        this.otherId = otherId;
+    }
+
+    public String getOtherName() {
+        return otherName;
+    }
+
+    public void setOtherName(String otherName) {
+        this.otherName = otherName;
+    }
+
+    public boolean getIsBuyer() {
+        return isBuyer;
+    }
+
+    public void setIsBuyer(boolean isBuyer) {
+        this.isBuyer = isBuyer;
+    }
+
+    public int getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
+    }
+
+    public String getStatusDescription() {
+        return statusDescription;
+    }
+
+    public void setStatusDescription(String statusDescription) {
+        this.statusDescription = statusDescription;
+    }
+
+    public int getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public Float getDailyPrice() {
+		return dailyPrice;
+	}
+
+	public void setDailyPrice(Float dailyPrice) {
+		this.dailyPrice = dailyPrice;
+	}
+
+	public Float getWeeklyPrice() {
+		return weeklyPrice;
+	}
+
+	public void setWeeklyPrice(Float weeklyPrice) {
+		this.weeklyPrice = weeklyPrice;
+	}
+
+	public Float getMonthlyPrice() {
+		return monthlyPrice;
+	}
+
+	public void setMonthlyPrice(Float monthlyPrice) {
+		this.monthlyPrice = monthlyPrice;
+	}
+
+	public Float getValue() {
+		return value;
+	}
+
+	public void setValue(Float value) {
+		this.value = value;
+	}
+
+	public String getItemDescriptionPreRent() {
+        return itemDescriptionPreRent;
+    }
+
+    public void setItemDescriptionPreRent(String itemDescriptionPreRent) {
+        this.itemDescriptionPreRent = itemDescriptionPreRent;
+    }
+
+    public Integer getBuyerRate() {
+        return buyerRate;
+    }
+
+    public void setBuyerRate(Integer buyerRate) {
+        this.buyerRate = buyerRate;
+    }
+
+    public String getBuyerFeedback() {
+        return buyerFeedback;
+    }
+
+    public void setBuyerFeedback(String buyerFeedback) {
+        this.buyerFeedback = buyerFeedback;
+    }
+
+    public Integer getSupplierRate() {
+        return supplierRate;
+    }
+
+    public void setSupplierRate(Integer supplierRate) {
+        this.supplierRate = supplierRate;
+    }
+
+    public String getSupplierFeedback() {
+        return supplierFeedback;
+    }
+
+    public void setSupplierFeedback(String supplierFeedback) {
+        this.supplierFeedback = supplierFeedback;
+    }
+
+    public Integer getItemRate() {
+        return itemRate;
+    }
+
+    public void setItemRate(Integer itemRate) {
+        this.itemRate = itemRate;
+    }
+
+    public String getItemFeedback() {
+        return itemFeedback;
+    }
+
+    public void setItemFeedback(String itemFeedback) {
+        this.itemFeedback = itemFeedback;
+    }
+
+	public String getCancellationReason() {
+		return cancellationReason;
+	}
+
+	public void setCancellationReason(String cancellationReason) {
+		this.cancellationReason = cancellationReason;
+	}
+}

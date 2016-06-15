@@ -1,0 +1,18 @@
+<div ng-controller="SearchController" ng-init="init()" class="container margintop20">
+    <div class="row clearfix">
+        <div class="col-md-3 column">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Advanced Search</h3>
+                </div>
+                <ul class="fa-ul margintop10">
+                    <li ng-class="{ active2 : getTab() == 1 }" class="active"><i class="fa-li fa fa-search"></i><b><a ng-href="#/advanced?tab=1">Find Items</a></b></li>
+                    <li ng-class="{ active2 : getTab() == 2 }" class="active"><i class="fa-li fa fa-user"></i><b><a ng-href="#/advanced?tab=2">By Member</a></b></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 column">
+            <advanced-directive></advanced-directive>
+        </div>
+    </div>
+</div>

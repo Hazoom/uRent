@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html ng-app="uRent" lang="en">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>uRent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!--<link rel="stylesheet/less" href="less/bootstrap.less" type="text/css">-->
+    <!--<link rel="stylesheet/less" href="less/responsive.less" type="text/css">-->
+    <!--<script src="js/less-1.3.3.min.js"></script>-->
+    <!--append ��#!watch�� to the browser URL, then refresh the page. -->
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="css/bootstrap-theme.min.css" rel="stylesheet">-->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/messages.css" rel="stylesheet">
+    <link href="css/angular-aside.css" rel="stylesheet">
+    <link href="css/loading-bar.css" rel="stylesheet">
+    <link href="css/alertify.core.css" rel="stylesheet">
+    <link href="css/alertify.default.css" rel="stylesheet">
+	<link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
+	<link rel="stylesheet" href="css/bootstrap-image-gallery.min.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+        <script src="js/html5shiv.js"></script>
+        <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="img/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="img/apple-touch-icon-57-precomposed.png">
+    <link rel="shortcut icon" href="img/favicon.png">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script type="text/javascript" src="js/angular.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/scripts.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,places"></script>
+    <script type="text/javascript" src="js/angular-file-upload.js"></script>
+    <script type="text/javascript" src="js/angular-route.js"></script>
+    <script type="text/javascript" src="js/angular-ui-router.js"></script>
+    <script type="text/javascript" src="js/ui-bootstrap-tpls-0.13.0.min.js"></script>
+    <script type="text/javascript" src="js/angular-aside.js"></script>
+    <script type="text/javascript" src="js/ng-websocket.js"></script>
+    <script type="text/javascript" src="js/loading-bar.js"></script>
+    <script type="text/javascript" src="js/alertify.js"></script>
+    <script type="text/javascript" src="js/scrollglue.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="item-directives.js"></script>
+    <script type="text/javascript" src="main-directives.js"></script>
+    <script type="text/javascript" src="addMember-directives.js"></script>
+    <script type="text/javascript" src="myarea-directives.js"></script>
+    <script type="text/javascript" src="showItems-directives.js"></script>
+    <script type="text/javascript" src="categories-directives.js"></script>
+    <script type="text/javascript" src="messages-directives.js"></script>
+    <script type="text/javascript" src="rents-directives.js"></script>
+    <script type="text/javascript" src="search-directives.js"></script>
+    
+    <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
+	<script src="js/bootstrap-image-gallery.min.js"></script>
+	
+</head>
+
+<body ng-controller="MainController">
+
+<div ng-controller="CategoriesController">
+
+    <!-- header -->
+    <header-directive>
+    </header-directive>
+
+    <div ui-view>
+        <!-- <carousel-directive>
+        </carousel-directive> -->
+        <div class="container margintop20">
+            <div class="row clearfix">
+                <div class="col-md-3 column">
+                    <!-- <categories-directive>
+                    </categories-directive> -->
+                    <bodyleftwells-directive>
+                    </bodyleftwells-directive>
+                </div>
+                <bodyitems-directive>
+                </bodyitems-directive>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer-directive>
+    </footer-directive>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+package exportBeans;
+
+import entities.RentEntity;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: Ran
+ * Date: 16/01/15
+ * Time: 17:49
+ * To change this template use File | Settings | File Templates.
+ */
+public class RentScheduleBean {
+
+    private int id;
+    private Long startDate;
+    private Long endDate;
+
+    public RentScheduleBean(RentEntity Rent) {
+        this.id = Rent.getId();
+        this.startDate = Rent.getRentfromdate().getTime();
+        this.endDate = Rent.getRenttodate().getTime();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public Long getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
+    }
+
+    public Long getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Long endDate) {
+        this.endDate = endDate;
+    }
+}

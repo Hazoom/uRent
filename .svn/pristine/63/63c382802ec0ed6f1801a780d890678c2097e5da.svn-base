@@ -1,0 +1,6 @@
+<div ng-if="getTab() == 1">
+    <finditems-directive></finditems-directive>
+</div>
+<div ng-if="getTab() == 2">
+    <findbymember-directive></findbymember-directive>
+</div>
